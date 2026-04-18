@@ -85,9 +85,9 @@ const StudentDashboard = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 w-full overflow-hidden">
           {/* Left Column */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 w-full min-w-0">
             {/* Call to Action */}
             <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl">
               <div className="absolute top-0 right-0 p-4 opacity-10"><Zap size={120} /></div>
@@ -233,11 +233,11 @@ const StudentDashboard = () => {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-8">
+          <div className="space-y-8 w-full min-w-0">
             {/* Quick Info Card */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm sticky top-6">
+            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm sticky top-20 w-full">
               <h2 className="text-xl font-bold text-slate-800 mb-6">Your Information</h2>
-              <div className="space-y-4">
+              <div className="space-y-4 overflow-hidden">
                 {student && (
                   <>
                     <InfoItem icon={<User size={16} />} label="Name" value={student.student_name} />

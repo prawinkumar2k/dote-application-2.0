@@ -19,7 +19,7 @@ const MainLayout = ({ children, role = 'guest' }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc]">
+    <div className="min-h-screen flex flex-col bg-[#f8fafc] overflow-x-hidden">
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -85,8 +85,8 @@ const MainLayout = ({ children, role = 'guest' }) => {
           </aside>
         )}
 
-        <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <main className="flex-1 p-6 max-w-7xl mx-auto w-full overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="w-full">
             {children}
           </motion.div>
         </main>
