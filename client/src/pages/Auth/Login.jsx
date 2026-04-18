@@ -46,7 +46,7 @@ const Login = () => {
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* Left Side - Visual */}
       <div className="hidden lg:flex bg-blue-600 items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-700 to-blue-500 opacity-90"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(135deg,#2563eb_0%,#60a5fa_100%)] opacity-90"></div>
         <div className="relative z-10 text-white max-w-md">
           <div className="bg-white/20 backdrop-blur-lg w-16 h-16 rounded-2xl flex items-center justify-center mb-8">
             <LogIn size={32} />
@@ -67,7 +67,7 @@ const Login = () => {
         <div className="w-full max-w-md">
           <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-slate-100">
             <div className="mb-10">
-              <Link to="/" className="text-blue-600 font-bold mb-4 inline-block hover:translate-x-[-4px] transition-transform">← Back to website</Link>
+              <Link to="/" className="text-blue-600 font-bold mb-4 inline-block hover:-translate-x-1 transition-transform">← Back to website</Link>
               <h1 className="text-3xl font-bold text-slate-800">Login</h1>
               <p className="text-slate-500 mt-2">Enter your credentials to access your account</p>
             </div>
