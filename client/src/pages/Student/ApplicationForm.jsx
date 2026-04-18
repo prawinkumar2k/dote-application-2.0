@@ -65,7 +65,7 @@ const ApplicationForm = () => {
 
         {/* Stepper */}
         <div className="mb-12 overflow-x-auto pb-4">
-          <div className="flex justify-between items-center min-w-[800px]">
+          <div className="flex justify-between items-center min-w-full">
             {steps.map((step) => (
               <div key={step.id} className="flex flex-col items-center flex-1 relative">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-all ${currentStep >= step.id ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-200 text-slate-500'}`}>
@@ -148,7 +148,7 @@ const ContactInfo = ({ data, onChange }) => (
     <InputGroup label="Alternate Mobile" name="alternateMobile" value={data.alternateMobile} onChange={onChange} />
     <div className="md:col-span-2">
       <label className="block text-sm font-semibold text-slate-700 mb-2">Communication Address</label>
-      <textarea name="commAddress" className="input-field min-h-[100px]" value={data.commAddress} onChange={onChange} placeholder="House No, Street, City, District, PIN Code" required />
+      <textarea name="commAddress" className="input-field min-h-28" value={data.commAddress} onChange={onChange} placeholder="House No, Street, City, District, PIN Code" required />
     </div>
     <div className="md:col-span-2 flex items-center gap-2 my-2">
       <input type="checkbox" name="sameAsComm" checked={data.sameAsComm} onChange={onChange} className="w-4 h-4" />
@@ -157,7 +157,7 @@ const ContactInfo = ({ data, onChange }) => (
     {!data.sameAsComm && (
       <div className="md:col-span-2">
         <label className="block text-sm font-semibold text-slate-700 mb-2">Permanent Address</label>
-        <textarea name="permAddress" className="input-field min-h-[100px]" value={data.permAddress} onChange={onChange} />
+        <textarea name="permAddress" className="input-field min-h-28" value={data.permAddress} onChange={onChange} />
       </div>
     )}
   </div>
