@@ -82,6 +82,11 @@ const Student = {
     await db.query('UPDATE student_master SET community_certificate=? WHERE id=?', [path, id]);
   },
 
+  findByAadhaar: async (aadhaar) => {
+    const [rows] = await db.query('SELECT id FROM student_master WHERE aadhar = ? LIMIT 1', [aadhaar]);
+    return rows[0];
+  },
+
   submit: async (id) => {
     const appNo = 'DOTE-2026-' + String(id).padStart(6, '0');
     await db.query('UPDATE student_master SET application_no=? WHERE id=?', [appNo, id]);

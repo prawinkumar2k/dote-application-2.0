@@ -51,7 +51,7 @@ const defaultForm = {
   // Step 7
   isDifferentlyAbled: false, isExServiceman: false, isSportsPerson: false, isGovtStudent: false,
   // Step 8
-  hostelRequired: false, womensHostel: false, preferences: ['', '', ''],
+  hostelRequired: false, womensHostel: false, preferences: [],
   // Step 9 file paths
   photoPath: '', tcPath: '', marksheetPath: '', communityPath: '',
 };
@@ -232,7 +232,7 @@ const ApplicationForm = () => {
         isGovtStudent: s.school_type === 'govt',
         hostelRequired: s.hostel_choice === 'yes',
         womensHostel: s.womens_choice === 'yes',
-        preferences: s.college_choices ? (() => { try { return JSON.parse(s.college_choices); } catch { return ['','','']; } })() : ['', '', ''],
+        preferences: s.college_choices ? (() => { try { return JSON.parse(s.college_choices); } catch { return []; } })() : [],
         photoPath: s.photo || '',
         tcPath: s.transfer_certificate || '',
         marksheetPath: s.marksheet_certificate || '',
@@ -281,8 +281,17 @@ const ApplicationForm = () => {
 
   const handlePreferenceChange = (index, value) => {
     setFormData(prev => {
-      const prefs = [...prev.preferences];
-      prefs[index] = value;
+      const prefs = Array.isArray(prev.preferences) ? [...prev.preferences] : [];
+      // Ensure array is large enough
+      while (prefs.length <= index) {
+        prefs.push('');
+      }
+      // Set or remove value
+      if (value === null) {
+        prefs.pop(); // Remove last item
+      } else {
+        prefs[index] = value;
+      }
       return { ...prev, preferences: prefs };
     });
   };
@@ -341,9 +350,12 @@ const ApplicationForm = () => {
         setApplicationNo(res.data.applicationNo);
         toast.success(`Application submitted! ID: ${res.data.applicationNo}`);
         setTimeout(() => navigate('/student/my-application'), 2000);
+      } else {
+        toast.error(res.data.message || 'Submission failed. Please try again.');
       }
-    } catch {
-      toast.error('Submission failed. Please try again.');
+    } catch (err) {
+      const errMsg = err.response?.data?.message || 'Submission failed. Please try again.';
+      toast.error(errMsg);
     } finally {
       setSaving(false);
     }
@@ -393,15 +405,15 @@ const ApplicationForm = () => {
         <form onSubmit={onFormAction} className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
           <AnimatePresence mode="wait">
             <motion.div key={currentStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-              {currentStep === 1 && <PersonalDetails data={formData} onChange={handleInputChange} master={master} />}
-              {currentStep === 2 && <ContactInfo data={formData} onChange={handleInputChange} />}
-              {currentStep === 3 && <ParentDetails data={formData} onChange={handleInputChange} master={master} />}
-              {currentStep === 4 && <AcademicHistory data={formData} onChange={handleInputChange} master={master} />}
-              {currentStep === 5 && <MarksEntry data={formData} onChange={handleInputChange} master={master} />}
-              {currentStep === 6 && <DetailedHistory data={formData} onChange={handleInputChange} />}
-              {currentStep === 7 && <SpecialCategory data={formData} onChange={handleInputChange} />}
-              {currentStep === 8 && <CollegeChoice data={formData} onChange={handleInputChange} onPrefChange={handlePreferenceChange} colleges={colleges} master={master} />}
-              {currentStep === 9 && <DocumentUploads data={formData} onUpload={handleFileUpload} />}
+              {currentStep === 1 && <PersonalDetails data={formData} onChange={handleInputChange} master={master} disabled={isSubmitted} />}
+              {currentStep === 2 && <ContactInfo data={formData} onChange={handleInputChange} disabled={isSubmitted} />}
+              {currentStep === 3 && <ParentDetails data={formData} onChange={handleInputChange} master={master} disabled={isSubmitted} />}
+              {currentStep === 4 && <AcademicHistory data={formData} onChange={handleInputChange} master={master} disabled={isSubmitted} />}
+              {currentStep === 5 && <MarksEntry data={formData} onChange={handleInputChange} master={master} disabled={isSubmitted} />}
+              {currentStep === 6 && <DetailedHistory data={formData} onChange={handleInputChange} disabled={isSubmitted} />}
+              {currentStep === 7 && <SpecialCategory data={formData} onChange={handleInputChange} disabled={isSubmitted} />}
+              {currentStep === 8 && <CollegeChoice data={formData} onChange={handleInputChange} onPrefChange={handlePreferenceChange} colleges={colleges} master={master} disabled={isSubmitted} />}
+              {currentStep === 9 && <DocumentUploads data={formData} onUpload={handleFileUpload} disabled={isSubmitted} />}
             </motion.div>
           </AnimatePresence>
 
@@ -433,18 +445,18 @@ const SectionTitle = ({ title }) => (
   <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-100 pb-2">{title}</h3>
 );
 
-const InputGroup = ({ label, name, type = 'text', ...props }) => (
+const InputGroup = ({ label, name, type = 'text', disabled = false, ...props }) => (
   <div>
     <label className="block text-sm font-semibold text-slate-700 mb-2">{label}</label>
-    <input type={type} name={name} className="input-field" {...props} />
+    <input type={type} name={name} className="input-field disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-500" disabled={disabled} {...props} />
   </div>
 );
 
 // Dynamic select — options come from DB master data
-const SelectGroup = ({ label, name, options = [], value, onChange, required, placeholder }) => (
+const SelectGroup = ({ label, name, options = [], value, onChange, required, placeholder, disabled = false }) => (
   <div>
     <label className="block text-sm font-semibold text-slate-700 mb-2">{label}</label>
-    <select name={name} className="input-field" value={value} onChange={onChange} required={required}>
+    <select name={name} className="input-field disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-500" value={value} onChange={onChange} required={required} disabled={disabled}>
       <option value="">{placeholder || `Select ${label}`}</option>
       {options.map(opt => (
         <option key={opt} value={opt}>{opt}</option>
@@ -453,11 +465,11 @@ const SelectGroup = ({ label, name, options = [], value, onChange, required, pla
   </div>
 );
 
-const CheckboxCard = ({ label, name, checked, onChange }) => (
-  <label className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${checked ? 'border-blue-600 bg-blue-50 shadow-sm' : 'border-slate-100 hover:border-slate-200'}`}>
+const CheckboxCard = ({ label, name, checked, onChange, disabled = false }) => (
+  <label className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${disabled ? 'border-slate-100 bg-slate-50 cursor-not-allowed' : checked ? 'border-blue-600 bg-blue-50 shadow-sm' : 'border-slate-100 hover:border-slate-200'}`}>
     <div className="flex items-center justify-between">
-      <span className={`font-semibold ${checked ? 'text-blue-700' : 'text-slate-700'}`}>{label}</span>
-      <input type="checkbox" name={name} checked={checked} onChange={onChange} className="w-5 h-5 rounded-md" />
+      <span className={`font-semibold ${disabled ? 'text-slate-400' : checked ? 'text-blue-700' : 'text-slate-700'}`}>{label}</span>
+      <input type="checkbox" name={name} checked={checked} onChange={onChange} className="w-5 h-5 rounded-md" disabled={disabled} />
     </div>
   </label>
 );
@@ -465,66 +477,66 @@ const CheckboxCard = ({ label, name, checked, onChange }) => (
 // ─────────────────────────────────────────────────────────
 // Step components
 // ─────────────────────────────────────────────────────────
-const PersonalDetails = ({ data, onChange, master }) => (
+const PersonalDetails = ({ data, onChange, master, disabled }) => (
   <div className="grid md:grid-cols-2 gap-6">
     <div className="md:col-span-2"><SectionTitle title="1. Personal Details" /></div>
-    <InputGroup label="Full Name (As per school records)" name="fullName" value={data.fullName} onChange={onChange} required />
-    <InputGroup label="Date of Birth" name="dob" type="date" value={data.dob} onChange={onChange} required />
-    <SelectGroup label="Gender" name="gender" options={master?.gender || ['Male', 'Female', 'Transgender']} value={data.gender} onChange={onChange} required />
-    <InputGroup label="Aadhaar Number" name="aadhaar" value={data.aadhaar} onChange={onChange} maxLength={12} placeholder="12-digit Aadhaar" required />
-    <SelectGroup label="Religion" name="religion" options={master?.religion || ['Hindu', 'Christian', 'Muslim', 'Others']} value={data.religion} onChange={onChange} required />
-    <SelectGroup label="Community" name="community" options={master?.community || ['BC', 'MBC', 'OBC', 'OC', 'SC/ST']} value={data.community} onChange={onChange} required />
-    <InputGroup label="Caste" name="caste" value={data.caste} onChange={onChange} required />
-    <SelectGroup label="Admission Type" name="admissionType" options={master?.admissionType || ['First Year', 'Lateral Entry (2nd Year)', 'Part-Time']} value={data.admissionType} onChange={onChange} required />
-    <SelectGroup label="Mother Tongue" name="motherTongue" options={master?.motherTongue || ['Tamil', 'Telugu', 'Kannada', 'Malayalam', 'Hindi', 'Urdu', 'Others']} value={data.motherTongue} onChange={onChange} />
-    <SelectGroup label="Medium of Instruction" name="mediumOfInstruction" options={master?.mediumOfInstruction || ['Tamil', 'English', 'Urdu', 'Others']} value={data.mediumOfInstruction} onChange={onChange} />
-    <SelectGroup label="Nativity" name="nativity" options={master?.nativity || ['Tamil Nadu', 'Other State']} value={data.nativity} onChange={onChange} />
+    <InputGroup label="Full Name (As per school records)" name="fullName" value={data.fullName} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Date of Birth" name="dob" type="date" value={data.dob} onChange={onChange} required disabled={disabled} />
+    <SelectGroup label="Gender" name="gender" options={master?.gender || ['Male', 'Female', 'Transgender']} value={data.gender} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Aadhaar Number" name="aadhaar" value={data.aadhaar} onChange={onChange} maxLength={12} placeholder="12-digit Aadhaar" required disabled={disabled} />
+    <SelectGroup label="Religion" name="religion" options={master?.religion || ['Hindu', 'Christian', 'Muslim', 'Others']} value={data.religion} onChange={onChange} required disabled={disabled} />
+    <SelectGroup label="Community" name="community" options={master?.community || ['BC', 'MBC', 'OBC', 'OC', 'SC/ST']} value={data.community} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Caste" name="caste" value={data.caste} onChange={onChange} required disabled={disabled} />
+    <SelectGroup label="Admission Type" name="admissionType" options={master?.admissionType || ['First Year', 'Lateral Entry (2nd Year)', 'Part-Time']} value={data.admissionType} onChange={onChange} required disabled={disabled} />
+    <SelectGroup label="Mother Tongue" name="motherTongue" options={master?.motherTongue || ['Tamil', 'Telugu', 'Kannada', 'Malayalam', 'Hindi', 'Urdu', 'Others']} value={data.motherTongue} onChange={onChange} disabled={disabled} />
+    <SelectGroup label="Medium of Instruction" name="mediumOfInstruction" options={master?.mediumOfInstruction || ['Tamil', 'English', 'Urdu', 'Others']} value={data.mediumOfInstruction} onChange={onChange} disabled={disabled} />
+    <SelectGroup label="Nativity" name="nativity" options={master?.nativity || ['Tamil Nadu', 'Other State']} value={data.nativity} onChange={onChange} disabled={disabled} />
   </div>
 );
 
-const ContactInfo = ({ data, onChange }) => (
+const ContactInfo = ({ data, onChange, disabled }) => (
   <div className="grid md:grid-cols-2 gap-6">
     <div className="md:col-span-2"><SectionTitle title="2. Contact Information" /></div>
-    <InputGroup label="Email Address" name="email" type="email" value={data.email} onChange={onChange} required />
-    <InputGroup label="Alternate Mobile" name="alternateMobile" value={data.alternateMobile} onChange={onChange} placeholder="Optional" />
+    <InputGroup label="Email Address" name="email" type="email" value={data.email} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Alternate Mobile" name="alternateMobile" value={data.alternateMobile} onChange={onChange} placeholder="Optional" disabled={disabled} />
     <div className="md:col-span-2">
       <label className="block text-sm font-semibold text-slate-700 mb-2">Communication Address</label>
-      <textarea name="commAddress" className="input-field min-h-28" value={data.commAddress} onChange={onChange} placeholder="House No, Street, City, District, PIN Code" required />
+      <textarea name="commAddress" className="input-field min-h-28 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-500" value={data.commAddress} onChange={onChange} placeholder="House No, Street, City, District, PIN Code" required disabled={disabled} />
     </div>
     <div className="md:col-span-2 flex items-center gap-2 my-1">
-      <input type="checkbox" name="sameAsComm" checked={data.sameAsComm} onChange={onChange} className="w-4 h-4" />
+      <input type="checkbox" name="sameAsComm" checked={data.sameAsComm} onChange={onChange} className="w-4 h-4" disabled={disabled} />
       <span className="text-sm font-medium text-slate-600">Permanent Address same as Communication Address</span>
     </div>
     {!data.sameAsComm && (
       <div className="md:col-span-2">
         <label className="block text-sm font-semibold text-slate-700 mb-2">Permanent Address</label>
-        <textarea name="permAddress" className="input-field min-h-28" value={data.permAddress} onChange={onChange} placeholder="House No, Street, City, District, PIN Code" />
+        <textarea name="permAddress" className="input-field min-h-28 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-500" value={data.permAddress} onChange={onChange} placeholder="House No, Street, City, District, PIN Code" disabled={disabled} />
       </div>
     )}
   </div>
 );
 
-const ParentDetails = ({ data, onChange, master }) => (
+const ParentDetails = ({ data, onChange, master, disabled }) => (
   <div className="grid md:grid-cols-2 gap-6">
     <div className="md:col-span-2"><SectionTitle title="3. Parent / Guardian Details" /></div>
-    <InputGroup label="Father's Name" name="fatherName" value={data.fatherName} onChange={onChange} required />
-    <InputGroup label="Mother's Name" name="motherName" value={data.motherName} onChange={onChange} required />
-    <SelectGroup label="Parent Occupation" name="parentOccupation" options={master?.parentOccupation || ['Farmer', 'Business', 'Govt Employee', 'Private Employee', 'Daily Wages', 'Others']} value={data.parentOccupation} onChange={onChange} required />
-    <InputGroup label="Annual Income (₹)" name="annualIncome" type="number" value={data.annualIncome} onChange={onChange} placeholder="In Rupees" required />
+    <InputGroup label="Father's Name" name="fatherName" value={data.fatherName} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Mother's Name" name="motherName" value={data.motherName} onChange={onChange} required disabled={disabled} />
+    <SelectGroup label="Parent Occupation" name="parentOccupation" options={master?.parentOccupation || ['Farmer', 'Business', 'Govt Employee', 'Private Employee', 'Daily Wages', 'Others']} value={data.parentOccupation} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Annual Income (₹)" name="annualIncome" type="number" value={data.annualIncome} onChange={onChange} placeholder="In Rupees" required disabled={disabled} />
   </div>
 );
 
-const AcademicHistory = ({ data, onChange, master }) => (
+const AcademicHistory = ({ data, onChange, master, disabled }) => (
   <div className="grid md:grid-cols-2 gap-6">
     <div className="md:col-span-2"><SectionTitle title="4. Academic History" /></div>
-    <SelectGroup label="Qualifying Board" name="qualifyingBoard" options={master?.qualifyingBoard || ['State Board', 'CBSE', 'ICSE', 'ITI', 'Others']} value={data.qualifyingBoard} onChange={onChange} required />
-    <InputGroup label="Register Number" name="registerNumber" value={data.registerNumber} onChange={onChange} required />
-    <InputGroup label="Last School / Institute Attended" name="lastInstitute" value={data.lastInstitute} onChange={onChange} required />
-    <InputGroup label="Last Institute District" name="lastInstituteDistrict" value={data.lastInstituteDistrict} onChange={onChange} />
+    <SelectGroup label="Qualifying Board" name="qualifyingBoard" options={master?.qualifyingBoard || ['State Board', 'CBSE', 'ICSE', 'ITI', 'Others']} value={data.qualifyingBoard} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Register Number" name="registerNumber" value={data.registerNumber} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Last School / Institute Attended" name="lastInstitute" value={data.lastInstitute} onChange={onChange} required disabled={disabled} />
+    <InputGroup label="Last Institute District" name="lastInstituteDistrict" value={data.lastInstituteDistrict} onChange={onChange} disabled={disabled} />
   </div>
 );
 
-const MarksEntry = ({ data, onChange, master }) => {
+const MarksEntry = ({ data, onChange, master, disabled }) => {
   // Get board-specific subjects based on qualifyingBoard selection
   const getSubjectsForBoard = () => {
     const board = data.qualifyingBoard?.trim().toLocaleLowerCase();
@@ -551,9 +563,9 @@ const MarksEntry = ({ data, onChange, master }) => {
       <SectionTitle title={`5. Marks Entry (${data.qualifyingBoard || 'Qualifying Exam'})`} />
       {!data.qualifyingBoard && <div className="bg-amber-50 p-3 rounded text-amber-800 text-sm">⚠️ Select a Qualifying Board in Step 4 to see subject options</div>}
       <div className="grid md:grid-cols-3 gap-4">
-        <InputGroup label="Exam Register Number" name="hscRegisterNo" value={data.hscRegisterNo} onChange={onChange} />
-        <SelectGroup label="Exam Type" name="hscExamType" options={master?.hscExamType || ['Regular', 'Private', 'Improvement']} value={data.hscExamType} onChange={onChange} />
-        <SelectGroup label="Major Stream (if applicable)" name="hscMajorStream" options={master?.hscMajorStream || ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts']} value={data.hscMajorStream} onChange={onChange} />
+        <InputGroup label="Exam Register Number" name="hscRegisterNo" value={data.hscRegisterNo} onChange={onChange} disabled={disabled} />
+        <SelectGroup label="Exam Type" name="hscExamType" options={master?.hscExamType || ['Regular', 'Private', 'Improvement']} value={data.hscExamType} onChange={onChange} disabled={disabled} />
+        <SelectGroup label="Major Stream (if applicable)" name="hscMajorStream" options={master?.hscMajorStream || ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts']} value={data.hscMajorStream} onChange={onChange} disabled={disabled} />
       </div>
       <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 overflow-x-auto">
         <table className="w-full text-left min-w-full">
@@ -567,9 +579,9 @@ const MarksEntry = ({ data, onChange, master }) => {
           <tbody>
             {hscSubjects.map(s => (
               <tr key={s.nameKey} className="border-b border-slate-100 last:border-0">
-                <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2" value={data[s.nameKey] || s.default} onChange={onChange} placeholder={s.default} /></td>
-                <td className="py-2 pr-3"><input type="number" name={s.obtKey} className="input-field py-2" value={data[s.obtKey]} onChange={onChange} min="0" placeholder="0" /></td>
-                <td className="py-2"><input type="number" name={s.maxKey} className="input-field py-2" value={data[s.maxKey]} onChange={onChange} min="0" placeholder="100" /></td>
+                <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2 disabled:bg-slate-100 disabled:cursor-not-allowed" value={data[s.nameKey] || s.default} onChange={onChange} placeholder={s.default} disabled={disabled} /></td>
+                <td className="py-2 pr-3"><input type="number" name={s.obtKey} className="input-field py-2 disabled:bg-slate-100 disabled:cursor-not-allowed" value={data[s.obtKey]} onChange={onChange} min="0" placeholder="0" disabled={disabled} /></td>
+                <td className="py-2"><input type="number" name={s.maxKey} className="input-field py-2 disabled:bg-slate-100 disabled:cursor-not-allowed" value={data[s.maxKey]} onChange={onChange} min="0" placeholder="100" disabled={disabled} /></td>
               </tr>
             ))}
           </tbody>
@@ -583,12 +595,12 @@ const MarksEntry = ({ data, onChange, master }) => {
   );
 };
 
-const DetailedHistory = ({ data, onChange }) => (
+const DetailedHistory = ({ data, onChange, disabled }) => (
   <div className="space-y-8">
     <SectionTitle title="6. SSLC (10th Standard) Details" />
     <div className="grid md:grid-cols-2 gap-4">
-      <InputGroup label="SSLC Register Number" name="sslcRegisterNo" value={data.sslcRegisterNo} onChange={onChange} />
-      <InputGroup label="SSLC Marksheet Number" name="sslcMarksheetNo" value={data.sslcMarksheetNo} onChange={onChange} />
+      <InputGroup label="SSLC Register Number" name="sslcRegisterNo" value={data.sslcRegisterNo} onChange={onChange} disabled={disabled} />
+      <InputGroup label="SSLC Marksheet Number" name="sslcMarksheetNo" value={data.sslcMarksheetNo} onChange={onChange} disabled={disabled} />
     </div>
     <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 overflow-x-auto">
       <table className="w-full text-left min-w-full">
@@ -606,9 +618,9 @@ const DetailedHistory = ({ data, onChange }) => (
             { nameKey: 'sslcSub5', obtKey: 'sslcSub5Obt', maxKey: 'sslcSub5Max' },
           ].map(s => (
             <tr key={s.nameKey} className="border-b border-slate-100 last:border-0">
-              <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2" value={data[s.nameKey]} onChange={onChange} /></td>
-              <td className="py-2 pr-3"><input type="number" name={s.obtKey} className="input-field py-2" value={data[s.obtKey]} onChange={onChange} min="0" /></td>
-              <td className="py-2"><input type="number" name={s.maxKey} className="input-field py-2" value={data[s.maxKey]} onChange={onChange} min="0" /></td>
+              <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2 disabled:bg-slate-100 disabled:cursor-not-allowed" value={data[s.nameKey]} onChange={onChange} disabled={disabled} /></td>
+              <td className="py-2 pr-3"><input type="number" name={s.obtKey} className="input-field py-2 disabled:bg-slate-100 disabled:cursor-not-allowed" value={data[s.obtKey]} onChange={onChange} min="0" disabled={disabled} /></td>
+              <td className="py-2"><input type="number" name={s.maxKey} className="input-field py-2 disabled:bg-slate-100 disabled:cursor-not-allowed" value={data[s.maxKey]} onChange={onChange} min="0" disabled={disabled} /></td>
             </tr>
           ))}
         </tbody>
@@ -618,20 +630,20 @@ const DetailedHistory = ({ data, onChange }) => (
   </div>
 );
 
-const SpecialCategory = ({ data, onChange }) => (
+const SpecialCategory = ({ data, onChange, disabled }) => (
   <div className="space-y-6">
     <SectionTitle title="7. Special Category / Reservation" />
     <p className="text-sm text-slate-500">Select all categories that apply to you. These will be verified during document submission.</p>
     <div className="grid md:grid-cols-2 gap-4">
-      <CheckboxCard label="Differently Abled" name="isDifferentlyAbled" checked={data.isDifferentlyAbled} onChange={onChange} />
-      <CheckboxCard label="Ex-Servicemen's Ward" name="isExServiceman" checked={data.isExServiceman} onChange={onChange} />
-      <CheckboxCard label="Sports Person (District / State / National)" name="isSportsPerson" checked={data.isSportsPerson} onChange={onChange} />
-      <CheckboxCard label="Government School Student" name="isGovtStudent" checked={data.isGovtStudent} onChange={onChange} />
+      <CheckboxCard label="Differently Abled" name="isDifferentlyAbled" checked={data.isDifferentlyAbled} onChange={onChange} disabled={disabled} />
+      <CheckboxCard label="Ex-Servicemen's Ward" name="isExServiceman" checked={data.isExServiceman} onChange={onChange} disabled={disabled} />
+      <CheckboxCard label="Sports Person (District / State / National)" name="isSportsPerson" checked={data.isSportsPerson} onChange={onChange} disabled={disabled} />
+      <CheckboxCard label="Government School Student" name="isGovtStudent" checked={data.isGovtStudent} onChange={onChange} disabled={disabled} />
     </div>
   </div>
 );
 
-const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master }) => {
+const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master, disabled }) => {
   const [cityFilter, setCityFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
 
@@ -649,19 +661,42 @@ const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master }) => {
   const allTypes = master?.insType || ['Government', 'Aided', 'Self Finance'];
   const types = allTypes.filter(t => t !== 'Self Finance');
 
+  // Ensure preferences is an array
+  const prefs = Array.isArray(data.preferences) ? data.preferences : [];
+
+  // Add a new preference slot
+  const addPreference = () => {
+    if (!disabled) {
+      onPrefChange(prefs.length, '');
+    }
+  };
+
+  // Remove a preference
+  const removePreference = (index) => {
+    if (!disabled) {
+      const newPrefs = prefs.filter((_, i) => i !== index);
+      // Update all preferences
+      newPrefs.forEach((pref, idx) => {
+        onPrefChange(idx, pref);
+      });
+      // Clear the last slot if it exists
+      onPrefChange(newPrefs.length, null);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <SectionTitle title="8. College Choice" />
+      <SectionTitle title="8. College Choice - Select All Colleges You Want" />
 
       <div className="flex flex-col gap-3 bg-blue-50 p-4 rounded-xl text-blue-800">
         <label className="flex items-center gap-3">
-          <input type="checkbox" name="hostelRequired" checked={data.hostelRequired} onChange={onChange} className="w-5 h-5" />
+          <input type="checkbox" name="hostelRequired" checked={data.hostelRequired} onChange={onChange} className="w-5 h-5" disabled={disabled} />
           <span className="font-bold">I require hostel accommodation</span>
         </label>
         {/* Women's hostel option only shows for female students */}
         {data.gender?.toLowerCase() === 'female' && (
           <label className="flex items-center gap-3">
-            <input type="checkbox" name="womensHostel" checked={data.womensHostel} onChange={onChange} className="w-5 h-5" />
+            <input type="checkbox" name="womensHostel" checked={data.womensHostel} onChange={onChange} className="w-5 h-5" disabled={disabled} />
             <span className="font-bold">I require women's hostel</span>
           </label>
         )}
@@ -671,14 +706,14 @@ const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master }) => {
       <div className="grid md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Filter by City</label>
-          <select className="input-field" value={cityFilter} onChange={e => setCityFilter(e.target.value)}>
+          <select className="input-field disabled:bg-slate-100 disabled:cursor-not-allowed" value={cityFilter} onChange={e => setCityFilter(e.target.value)} disabled={disabled}>
             <option value="">All Cities ({validColleges.length} colleges)</option>
             {cities.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Filter by Type</label>
-          <select className="input-field" value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+          <select className="input-field disabled:bg-slate-100 disabled:cursor-not-allowed" value={typeFilter} onChange={e => setTypeFilter(e.target.value)} disabled={disabled}>
             <option value="">All Types</option>
             {types.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
@@ -686,49 +721,96 @@ const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master }) => {
       </div>
 
       <div className="space-y-4">
-        <p className="font-semibold text-slate-700">
-          Preference List (ordered by priority) —&nbsp;
-          <span className="text-blue-600">{filteredColleges.length} college{filteredColleges.length !== 1 ? 's' : ''} shown</span>
+        <div className="flex items-center justify-between">
+          <p className="font-semibold text-slate-700">
+            Your College Preferences (ordered by priority) —&nbsp;
+            <span className="text-blue-600">{prefs.filter(Boolean).length} college{prefs.filter(Boolean).length !== 1 ? 's' : ''} selected</span>
+          </p>
+          <button
+            type="button"
+            onClick={addPreference}
+            disabled={disabled || prefs.length >= filteredColleges.length}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            + Add College
+          </button>
+        </div>
+
+        <p className="text-sm text-slate-500 italic">
+          ℹ️ You can select as many colleges as you want. They will be processed in the order you list them. Each Aadhaar can only submit one application but with unlimited college choices.
         </p>
-        {[0, 1, 2].map(i => (
-          <div key={i} className="flex items-center gap-4">
-            <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0">{i + 1}</span>
-            <select className="input-field" value={data.preferences[i] || ''} onChange={e => onPrefChange(i, e.target.value)}>
-              <option value="">Select College...</option>
-              {filteredColleges.map(c => (
-                <option key={c.id} value={c.ins_code}
-                  disabled={data.preferences.includes(c.ins_code) && data.preferences[i] !== c.ins_code}>
-                  [{c.ins_code}] {c.ins_name} — {c.ins_city}
-                </option>
-              ))}
-            </select>
+
+        {prefs.length === 0 && (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+            ⚠️ No colleges selected yet. Click "+ Add College" to start adding colleges to your preference list.
           </div>
-        ))}
+        )}
+
+        <div className="space-y-3">
+          {prefs.map((pref, i) => (
+            <div key={i} className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0 text-sm">{i + 1}</span>
+              <select
+                className="input-field flex-1 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                value={pref || ''}
+                onChange={e => onPrefChange(i, e.target.value)}
+                disabled={disabled}
+              >
+                <option value="">Select College...</option>
+                {filteredColleges.map(c => (
+                  <option
+                    key={c.id}
+                    value={c.ins_code}
+                    disabled={prefs.includes(c.ins_code) && prefs[i] !== c.ins_code}
+                  >
+                    [{c.ins_code}] {c.ins_name} — {c.ins_city}
+                  </option>
+                ))}
+              </select>
+              {pref && (
+                <button
+                  type="button"
+                  onClick={() => removePreference(i)}
+                  disabled={disabled}
+                  className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
-const DocumentUploads = ({ data, onUpload }) => (
+const DocumentUploads = ({ data, onUpload, disabled }) => (
   <div className="space-y-6">
     <SectionTitle title="9. Document Uploads & Submission" />
     <div className="grid md:grid-cols-2 gap-6">
-      <UploadBox label="Passport Photo" subLabel="Mandatory • JPG or PNG" docType="photo" currentPath={data.photoPath} onUpload={onUpload} accept="image/*" />
-      <UploadBox label="Transfer Certificate (TC)" subLabel="JPG, PNG or PDF" docType="tc" currentPath={data.tcPath} onUpload={onUpload} accept=".pdf,.jpg,.jpeg,.png" />
-      <UploadBox label="Qualifying Marksheet" subLabel="HSC / SSLC marksheet" docType="marksheet" currentPath={data.marksheetPath} onUpload={onUpload} accept=".pdf,.jpg,.jpeg,.png" />
-      <UploadBox label="Community Certificate" subLabel="For BC / MBC / SC / ST" docType="community" currentPath={data.communityPath} onUpload={onUpload} accept=".pdf,.jpg,.jpeg,.png" />
+      <UploadBox label="Passport Photo" subLabel="Mandatory • JPG or PNG" docType="photo" currentPath={data.photoPath} onUpload={onUpload} accept="image/*" disabled={disabled} />
+      <UploadBox label="Transfer Certificate (TC)" subLabel="JPG, PNG or PDF" docType="tc" currentPath={data.tcPath} onUpload={onUpload} accept=".pdf,.jpg,.jpeg,.png" disabled={disabled} />
+      <UploadBox label="Qualifying Marksheet" subLabel="HSC / SSLC marksheet" docType="marksheet" currentPath={data.marksheetPath} onUpload={onUpload} accept=".pdf,.jpg,.jpeg,.png" disabled={disabled} />
+      <UploadBox label="Community Certificate" subLabel="For BC / MBC / SC / ST" docType="community" currentPath={data.communityPath} onUpload={onUpload} accept=".pdf,.jpg,.jpeg,.png" disabled={disabled} />
     </div>
+    {disabled && (
+      <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 text-blue-800 text-sm font-semibold">
+        ✓ Application Submitted - Documents are locked for viewing only
+      </div>
+    )}
     <div className="p-6 bg-amber-50 rounded-2xl border border-amber-200 text-amber-800 text-sm">
       <strong>Declaration:</strong> I hereby declare that all the information provided in this application is true and correct to the best of my knowledge. Any false information may lead to the rejection of my application.
     </div>
   </div>
 );
 
-const UploadBox = ({ label, subLabel, docType, currentPath, onUpload, accept }) => {
+const UploadBox = ({ label, subLabel, docType, currentPath, onUpload, accept, disabled }) => {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
 
   const handleChange = async (e) => {
+    if (disabled) return;
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) { toast.error('File too large. Max 5MB allowed.'); return; }
@@ -738,20 +820,20 @@ const UploadBox = ({ label, subLabel, docType, currentPath, onUpload, accept }) 
   };
 
   return (
-    <div onClick={() => !uploading && inputRef.current?.click()}
-      className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer group
-        ${currentPath ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-blue-400 hover:bg-slate-50'}`}>
-      <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={handleChange} />
+    <div onClick={() => !uploading && !disabled && inputRef.current?.click()}
+      className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-all ${disabled ? 'cursor-not-allowed' : 'cursor-pointer group'}
+        ${disabled ? 'border-slate-200 bg-slate-50' : currentPath ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-blue-400 hover:bg-slate-50'}`}>
+      <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={handleChange} disabled={disabled} />
       <div className={`p-3 rounded-full transition-colors
-        ${currentPath ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500 group-hover:text-blue-600 group-hover:bg-blue-50'}`}>
+        ${disabled ? 'bg-slate-100 text-slate-400' : currentPath ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500 group-hover:text-blue-600 group-hover:bg-blue-50'}`}>
         {uploading ? <Loader size={24} className="animate-spin" /> : currentPath ? <Check size={24} /> : <Upload size={24} />}
       </div>
       <div className="text-center">
-        <p className="font-semibold text-slate-700">{label}</p>
+        <p className={`font-semibold ${disabled ? 'text-slate-500' : 'text-slate-700'}`}>{label}</p>
         <p className="text-xs text-slate-400 mt-1">{subLabel}</p>
       </div>
       {currentPath
-        ? <p className="text-xs text-emerald-600 font-semibold">✓ Uploaded — click to replace</p>
+        ? <p className="text-xs text-emerald-600 font-semibold">✓ Uploaded{!disabled && ' — click to replace'}</p>
         : <p className="text-xs text-slate-400">Max 5MB</p>}
     </div>
   );

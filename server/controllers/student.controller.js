@@ -107,10 +107,30 @@ const submitApplication = async (req, res) => {
   try {
     const id = req.user.id;
     const student = await Student.findById(id);
+    
     if (!student) return res.status(404).json({ message: 'Student not found' });
+    
+    // Check if already submitted
     if (student.application_no) {
       return res.json({ success: true, applicationNo: student.application_no, message: 'Already submitted' });
     }
+
+    // Check if Aadhaar is already used by another student
+    if (student.aadhar) {
+      const existingAadhaar = await Student.findByAadhaar(student.aadhar);
+      if (existingAadhaar && existingAadhaar.id !== id) {
+        return res.status(409).json({ 
+          success: false, 
+          message: 'This Aadhaar number has already been used for another application. Each Aadhaar can only be used once.' 
+        });
+      }
+    } else {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Aadhaar number is required to submit application' 
+      });
+    }
+
     const appNo = await Student.submit(id);
     res.json({ success: true, applicationNo: appNo, message: 'Application submitted successfully' });
   } catch (err) {
