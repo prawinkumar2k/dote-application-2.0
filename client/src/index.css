@@ -109,3 +109,117 @@ button {
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
 }
+
+/* Print Styles - Optimize for A4 paper */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  body {
+    line-height: 1.4;
+    font-size: 11pt;
+  }
+
+  /* Page margins and sizing */
+  @page {
+    size: A4;
+    margin: 0.5in;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Prevent breaking inside elements */
+  .print\:break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Hide scrollbars and unnecessary elements */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Ensure images print at good quality */
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+
+  /* Table styling for printing */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* Background colors print properly */
+  .bg-white, .print\:bg-white {
+    background-color: white !important;
+  }
+
+  .bg-slate-50, .print\:bg-slate-50,
+  .bg-blue-50, .print\:bg-blue-50,
+  .bg-emerald-50, .print\:bg-emerald-50,
+  .bg-orange-50, .print\:bg-orange-50 {
+    background-color: #f8fafc !important;
+  }
+
+  /* Borders print clearly */
+  border, [class*='border'] {
+    border-color: #000 !important;
+  }
+
+  /* Text colors remain visible */
+  .text-slate-900, .print\:text-slate-900 {
+    color: #000 !important;
+  }
+
+  .text-slate-700, .print\:text-slate-700 {
+    color: #374151 !important;
+  }
+
+  /* Section spacing for multi-page documents */
+  h1, h2, h3 {
+    page-break-after: avoid;
+    margin-bottom: 6pt;
+  }
+
+  /* Prevent orphaned paragraph spacing */
+  p {
+    orphans: 4;
+    widows: 4;
+  }
+
+  /* QR codes and images */
+  div[class*='overflow'] {
+    overflow: visible;
+  }
+
+  /* Footer positioning */
+  footer {
+    page-break-inside: avoid;
+    margin-top: 12pt;
+  }
+}
