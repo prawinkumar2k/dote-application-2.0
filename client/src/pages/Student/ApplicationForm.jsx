@@ -112,18 +112,20 @@ const ApplicationForm = () => {
     // Calculate totals - only count if both obtained and max are filled
     let totalObtained = 0;
     let totalMax = 0;
-    let hasMarks = false;
+    let countedSubjects = 0;
 
     marks.forEach(m => {
-      if (m.obt && m.max) {
-        totalObtained += Number(m.obt) || 0;
-        totalMax += Number(m.max) || 0;
-        hasMarks = true;
+      const obt = Number(m.obt);
+      const max = Number(m.max);
+      if (!isNaN(obt) && !isNaN(max) && obt >= 0 && max > 0) {
+        totalObtained += obt;
+        totalMax += max;
+        countedSubjects++;
       }
     });
 
-    // Calculate percentage and cutoff
-    if (hasMarks && totalMax > 0) {
+    // Calculate percentage and cutoff only if we have at least one subject with marks
+    if (countedSubjects > 0 && totalMax > 0) {
       const percentage = ((totalObtained / totalMax) * 100).toFixed(2);
       const cutoff = ((totalObtained / totalMax) * 200).toFixed(2);
       
@@ -131,12 +133,6 @@ const ApplicationForm = () => {
         ...prev,
         hscPercentage: percentage,
         hscCutoff: cutoff,
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        hscPercentage: '',
-        hscCutoff: '',
       }));
     }
   }, [
@@ -161,28 +157,25 @@ const ApplicationForm = () => {
     // Calculate totals - only count if both obtained and max are filled
     let totalObtained = 0;
     let totalMax = 0;
-    let hasMarks = false;
+    let countedSubjects = 0;
 
     sslcMarks.forEach(m => {
-      if (m.obt && m.max) {
-        totalObtained += Number(m.obt) || 0;
-        totalMax += Number(m.max) || 0;
-        hasMarks = true;
+      const obt = Number(m.obt);
+      const max = Number(m.max);
+      if (!isNaN(obt) && !isNaN(max) && obt >= 0 && max > 0) {
+        totalObtained += obt;
+        totalMax += max;
+        countedSubjects++;
       }
     });
 
-    // Calculate percentage
-    if (hasMarks && totalMax > 0) {
+    // Calculate percentage only if we have at least one subject with marks
+    if (countedSubjects > 0 && totalMax > 0) {
       const percentage = ((totalObtained / totalMax) * 100).toFixed(2);
       
       setFormData(prev => ({
         ...prev,
         sslcPercentage: percentage,
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        sslcPercentage: '',
       }));
     }
   }, [
@@ -583,8 +576,8 @@ const MarksEntry = ({ data, onChange, master }) => {
         </table>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <InputGroup label="Overall Percentage (%)" name="hscPercentage" type="number" value={data.hscPercentage} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
-        <InputGroup label="Cutoff Mark (out of 200)" name="hscCutoff" type="number" value={data.hscCutoff} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
+        <InputGroup label="Overall Percentage (%)" name="hscPercentage" type="number" step="0.01" value={data.hscPercentage || ''} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
+        <InputGroup label="Cutoff Mark (out of 200)" name="hscCutoff" type="number" step="0.01" value={data.hscCutoff || ''} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
       </div>
     </div>
   );
@@ -621,7 +614,7 @@ const DetailedHistory = ({ data, onChange }) => (
         </tbody>
       </table>
     </div>
-    <InputGroup label="SSLC Overall Percentage (%)" name="sslcPercentage" type="number" value={data.sslcPercentage} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
+    <InputGroup label="SSLC Overall Percentage (%)" name="sslcPercentage" type="number" step="0.01" value={data.sslcPercentage || ''} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
   </div>
 );
 
