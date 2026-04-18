@@ -446,7 +446,7 @@ const MarksEntry = ({ data, onChange, master }) => {
           <tbody>
             {hscSubjects.map(s => (
               <tr key={s.nameKey} className="border-b border-slate-100 last:border-0">
-                <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2" value={data[s.nameKey]} onChange={onChange} placeholder={s.default} /></td>
+                <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2" value={data[s.nameKey] || s.default} onChange={onChange} placeholder={s.default} /></td>
                 <td className="py-2 pr-3"><input type="number" name={s.obtKey} className="input-field py-2" value={data[s.obtKey]} onChange={onChange} min="0" placeholder="0" /></td>
                 <td className="py-2"><input type="number" name={s.maxKey} className="input-field py-2" value={data[s.maxKey]} onChange={onChange} min="0" placeholder="100" /></td>
               </tr>
