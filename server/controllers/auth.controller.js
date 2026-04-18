@@ -76,17 +76,13 @@ const login = async (req, res) => {
         [identifier]
       );
 
-      console.log('[College login] Record:', college);
-
       if (!college) {
         return res.status(401).json({
           message: `No college found with ins_code "${identifier}"`,
         });
       }
 
-      // FIX: Convert to string — MySQL2 may return Buffer for BINARY columns
       const storedPassword = toStr(college.password);
-      console.log('[College login] storedPassword type:', typeof storedPassword, '| value:', storedPassword);
 
       if (!storedPassword) {
         return res.status(401).json({ message: 'Password not set for this college account' });
@@ -114,8 +110,6 @@ const login = async (req, res) => {
         'SELECT * FROM user_master WHERE user_id = ?',
         [identifier]
       );
-
-      console.log('[Admin login] Record:', userRecord);
 
       if (!userRecord) {
         return res.status(401).json({ message: 'Invalid credentials' });
@@ -146,8 +140,6 @@ const login = async (req, res) => {
         'SELECT * FROM student_master WHERE email = ? OR user_id = ?',
         [identifier, identifier]
       );
-
-      console.log('[Student login] Record:', student);
 
       if (!student) {
         return res.status(401).json({ message: 'Invalid credentials' });

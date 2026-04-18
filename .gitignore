@@ -1,7 +1,31 @@
+# Dependencies
 node_modules/
 client/node_modules/
 server/node_modules/
+
+# Environment variables - NEVER commit these
 .env
-*.log
+.env.local
+.env.production
+
+# Uploaded student files - exclude actual files, keep folder structure via server.js auto-create
+server/uploads/student/photos/*
+server/uploads/student/documents/*
+!server/uploads/student/photos/.gitkeep
+!server/uploads/student/documents/.gitkeep
+
+# Build output
 dist/
+client/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

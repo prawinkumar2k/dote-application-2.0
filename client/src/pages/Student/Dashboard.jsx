@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
-import { 
-  FileText, ArrowRight, Download, CheckCircle, Clock, AlertCircle, BookOpen,
-  DollarSign, Calendar, Users, Award, Zap, Info, Mail, Phone, MapPin,
-  FileCheck, Upload, Eye, Settings, User
+import {
+  FileText, ArrowRight, Download, CheckCircle, Clock, AlertCircle,
+  Calendar, Award, Zap, Info, Mail, Phone, MapPin,
+  FileCheck, Upload, Eye, User
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -450,23 +450,6 @@ const CheckItem = ({ done, text }) => (
     <span className={`text-sm ${done ? 'text-slate-800 font-semibold' : 'text-slate-600'}`}>
       {text}
     </span>
-  </div>
-);
-
-const InfoRow = ({ label, value, highlight }) => (
-  <div className="flex justify-between items-center py-2 border-b border-slate-50">
-    <span className="text-sm text-slate-500">{label}</span>
-    <span className={`text-sm font-semibold ${highlight ? 'text-emerald-600' : 'text-slate-800'}`}>{value || '—'}</span>
-  </div>
-);
-
-const TimelineStep = ({ title, desc, active, pulse }) => (
-  <div className="flex-1 flex flex-col items-center text-center">
-    <div className={`w-8 h-8 rounded-full mb-3 flex items-center justify-center ${active ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'} ${pulse ? 'animate-pulse' : ''}`}>
-      {active ? <CheckCircle size={16} /> : <div className="w-2 h-2 rounded-full bg-slate-300" />}
-    </div>
-    <p className={`font-bold text-sm ${active ? 'text-slate-800' : 'text-slate-400'}`}>{title}</p>
-    <p className="text-xs text-slate-500 mt-1">{desc}</p>
   </div>
 );
 

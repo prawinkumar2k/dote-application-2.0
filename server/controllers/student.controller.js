@@ -73,25 +73,11 @@ const uploadDocument = async (req, res) => {
     const filename = req.file.filename;
     const filePath = `/uploads/student/${folder}/${filename}`;
 
-    console.log(`📤 Uploading ${docType} for student ${id}: ${filename}`);
-
     switch (docType) {
-      case 'photo': 
-        await Student.updatePhoto(id, filePath);
-        console.log(`✓ Photo saved: ${filePath}`);
-        break;
-      case 'tc': 
-        await Student.updateTC(id, filePath);
-        console.log(`✓ Transfer Certificate saved: ${filePath}`);
-        break;
-      case 'marksheet': 
-        await Student.updateMarksheet(id, filePath);
-        console.log(`✓ Marksheet saved: ${filePath}`);
-        break;
-      case 'community': 
-        await Student.updateCommunity(id, filePath);
-        console.log(`✓ Community Certificate saved: ${filePath}`);
-        break;
+      case 'photo': await Student.updatePhoto(id, filePath); break;
+      case 'tc': await Student.updateTC(id, filePath); break;
+      case 'marksheet': await Student.updateMarksheet(id, filePath); break;
+      case 'community': await Student.updateCommunity(id, filePath); break;
       default: 
         return res.status(400).json({ message: 'Invalid document type' });
     }

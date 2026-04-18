@@ -7,7 +7,10 @@ const Student = {
   },
 
   findById: async (id) => {
-    const [rows] = await db.query('SELECT * FROM student_master WHERE id = ?', [id]);
+    const [rows] = await db.query(
+      'SELECT * FROM student_master WHERE id = ? OR user_id = ? LIMIT 1',
+      [id, id]
+    );
     return rows[0];
   },
 

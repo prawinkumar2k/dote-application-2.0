@@ -14,8 +14,6 @@ const User = {
     );
     return result.insertId;
   },
-
-  // Add more queries as needed
 };
 
 module.exports = User;
