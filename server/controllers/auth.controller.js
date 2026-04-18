@@ -10,7 +10,7 @@ const toStr = (val) => (val ? val.toString() : null);
 
 const login = async (req, res) => {
   try {
-    const { userId, password, role } = req.body;
+    const { identifier, password, role } = req.body;
 
     if (!userId || !password || !role) {
       return res.status(400).json({ message: 'Please provide all fields' });
@@ -127,6 +127,7 @@ const login = async (req, res) => {
       return res.status(500).json({ message: 'Authentication failed unexpectedly' });
     }
 
+    const name = user.user_name || user.student_name || user.ins_name;
     const token = jwt.sign(
       { id: authUser.ins_code || authUser.user_id, role, name: displayName },
       process.env.JWT_SECRET,
@@ -163,4 +164,4 @@ const logout = (req, res) => {
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 };
 
-module.exports = { login, logout };
+module.exports = { login, register, logout };

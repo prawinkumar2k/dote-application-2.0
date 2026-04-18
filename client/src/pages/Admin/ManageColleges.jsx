@@ -30,47 +30,32 @@ const ManageColleges = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Manage Colleges</h1>
-            <p className="text-slate-500">Add, edit, or deactivate participating institutions</p>
+            <p className="text-slate-500">{total} active institutions in the system</p>
           </div>
-          <button 
-            onClick={() => setShowAddModal(true)}
-            className="btn-primary flex items-center justify-center gap-2"
-          >
-            <Plus size={20} /> Add New College
-          </button>
         </div>
 
-        {/* Filters and Search */}
         <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input type="text" placeholder="Search by name, code or location..." className="input-field pl-10" />
+            <input type="text" placeholder="Search by name or code..." className="input-field pl-10"
+              value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
           </div>
-          <div className="flex gap-2">
-            <select className="input-field w-auto min-w-[140px]">
-              <option value="">All Regions</option>
-              <option>North</option>
-              <option>South</option>
-              <option>West</option>
-              <option>East</option>
-            </select>
-            <button className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-colors">
-              <Filter size={18} /> Filter
-            </button>
-          </div>
+          <select className="input-field w-auto min-w-45" value={district} onChange={e => { setDistrict(e.target.value); setPage(1); }}>
+            <option value="">All Districts</option>
+            {districts.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
         </div>
 
-        {/* Colleges Table */}
         <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   <th className="px-6 py-4">College Name & Code</th>
-                  <th className="px-6 py-4">Location</th>
-                  <th className="px-6 py-4">Region</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4">Type</th>
+                  <th className="px-6 py-4">District</th>
+                  <th className="px-6 py-4">Principal</th>
+                  <th className="px-6 py-4">Contact</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -79,6 +64,8 @@ const ManageColleges = () => {
                     <td colSpan="5" className="px-6 py-12 text-center text-slate-400">
                       <Loader2 className="animate-spin inline mr-2" size={20} /> Loading colleges...
                     </td>
+                    <td className="px-6 py-5 text-sm text-slate-600">{c.ins_principal || '—'}</td>
+                    <td className="px-6 py-5 text-sm text-slate-600">{c.ins_phone_number || c.ins_email_id_office || '—'}</td>
                   </tr>
                 ) : colleges.length === 0 ? (
                   <tr>
@@ -137,12 +124,14 @@ const ManageColleges = () => {
               </tbody>
             </table>
           </div>
-          
+
           <div className="p-6 border-t border-slate-50 bg-slate-50/30 flex justify-between items-center">
             <p className="text-xs text-slate-500 font-medium">Showing {colleges.length} colleges</p>
             <div className="flex gap-2">
-              <button className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-400 cursor-not-allowed">Prev</button>
-              <button className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-blue-300 transition-colors">Next</button>
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 disabled:opacity-40">Prev</button>
+              <button onClick={() => setPage(p => p + 1)} disabled={page * 20 >= total}
+                className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 disabled:opacity-40">Next</button>
             </div>
           </div>
         </div>

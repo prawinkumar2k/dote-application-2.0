@@ -1,7 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
 
 :root {
   --primary: #1e40af;
@@ -91,6 +94,13 @@ button {
   outline: none;
   border-color: var(--primary-light);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-field:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
 }
 
 /* Animations */
