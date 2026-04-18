@@ -192,7 +192,15 @@ const ApplicationForm = () => {
     formData.sslcSub4Obt, formData.sslcSub4Max,
     formData.sslcSub5Obt, formData.sslcSub5Max,
   ]);
-
+  // CLEAR WOMEN'S HOSTEL PREFERENCE IF GENDER IS NOT FEMALE
+  useEffect(() => {
+    if (formData.gender && formData.gender?.toLowerCase() !== 'female' && formData.womensHostel) {
+      setFormData(prev => ({
+        ...prev,
+        womensHostel: false,
+      }));
+    }
+  }, [formData.gender]);
   const loadSavedData = async () => {
     try {
       const res = await axios.get('/api/student/me', { withCredentials: true });
@@ -658,10 +666,13 @@ const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master }) => {
           <input type="checkbox" name="hostelRequired" checked={data.hostelRequired} onChange={onChange} className="w-5 h-5" />
           <span className="font-bold">I require hostel accommodation</span>
         </label>
-        <label className="flex items-center gap-3">
-          <input type="checkbox" name="womensHostel" checked={data.womensHostel} onChange={onChange} className="w-5 h-5" />
-          <span className="font-bold">I require women's hostel</span>
-        </label>
+        {/* Women's hostel option only shows for female students */}
+        {data.gender?.toLowerCase() === 'female' && (
+          <label className="flex items-center gap-3">
+            <input type="checkbox" name="womensHostel" checked={data.womensHostel} onChange={onChange} className="w-5 h-5" />
+            <span className="font-bold">I require women's hostel</span>
+          </label>
+        )}
       </div>
 
       {/* Filters for college dropdown */}
