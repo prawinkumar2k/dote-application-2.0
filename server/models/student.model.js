@@ -6,6 +6,11 @@ const Student = {
     return rows[0];
   },
 
+  findByEmail: async (email) => {
+    const [rows] = await db.query('SELECT * FROM student_master WHERE email = ?', [email]);
+    return rows[0];
+  },
+
   // Add more queries for student application here
 };
 

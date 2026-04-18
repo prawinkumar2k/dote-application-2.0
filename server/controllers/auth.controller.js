@@ -6,19 +6,20 @@ const Student = require('../models/student.model');
 
 const login = async (req, res) => {
   try {
-    const { userId, password, role } = req.body;
+    const { identifier, password, role } = req.body;
 
-    if (!userId || !password || !role) {
+    if (!identifier || !password || !role) {
       return res.status(400).json({ message: 'Please provide all details' });
     }
 
     let user;
     if (role === 'admin') {
-      user = await User.findByUserId(userId);
+      user = await User.findByUserId(identifier);
     } else if (role === 'college') {
-      user = await Institution.findByUserId(userId);
+      user = await Institution.findByUserId(identifier);
     } else if (role === 'student') {
-      user = await Student.findByUserId(userId);
+      // For students, use email instead of user_id
+      user = await Student.findByEmail(identifier);
     }
 
     if (!user) {
@@ -31,7 +32,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id || user.user_id, role: role, name: user.user_name || user.name },
+      { id: user.id || user.user_id, role: role, name: user.user_name || user.name || user.student_name },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
@@ -47,7 +48,7 @@ const login = async (req, res) => {
       role: role,
       user: {
         id: user.id || user.user_id,
-        name: user.user_name || user.name,
+        name: user.user_name || user.name || user.student_name,
         role: role,
       },
     });

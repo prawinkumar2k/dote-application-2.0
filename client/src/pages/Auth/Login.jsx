@@ -5,8 +5,8 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 
 const Login = () => {
-  const [role, setRole] = useState('admin'); // Defaulting to Admin for now
-  const [userId, setUserId] = useState('');
+  const [role, setRole] = useState('student');
+  const [identifier, setIdentifier] = useState(''); // Email for student, User ID for others
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -14,15 +14,15 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    if (role !== 'admin') {
-      toast.info('Only Admin login is currently active. Student and College roles coming soon!');
+    if (!identifier || !password) {
+      toast.error('Please enter all credentials');
       return;
     }
 
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
-        userId,
+        identifier, // Email for student, User ID for admin/college
         password,
         role
       }, {
@@ -86,10 +86,22 @@ const Login = () => {
                 ))}
               </div>
 
-              {role !== 'admin' && (
-                <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl flex gap-3 text-amber-800 text-sm animate-fade-in">
+              {role === 'student' && (
+                <div className="bg-blue-50 border border-blue-100 p-3 rounded-xl flex gap-3 text-blue-800 text-sm animate-fade-in">
                   <AlertCircle size={18} className="shrink-0" />
-                  <p>Only **Admin** role is active currently. Use **admin_dote** to test.</p>
+                  <p>Login with your <strong>email</strong> and password</p>
+                </div>
+              )}
+              {role === 'admin' && (
+                <div className="bg-purple-50 border border-purple-100 p-3 rounded-xl flex gap-3 text-purple-800 text-sm animate-fade-in">
+                  <AlertCircle size={18} className="shrink-0" />
+                  <p>Login with user ID: <strong>admin_dote</strong></p>
+                </div>
+              )}
+              {role === 'college' && (
+                <div className="bg-green-50 border border-green-100 p-3 rounded-xl flex gap-3 text-green-800 text-sm animate-fade-in">
+                  <AlertCircle size={18} className="shrink-0" />
+                  <p>Login with your college user ID</p>
                 </div>
               )}
 
@@ -97,11 +109,11 @@ const Login = () => {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input 
-                    type="text" 
-                    placeholder="User ID" 
+                    type={role === 'student' ? 'email' : 'text'}
+                    placeholder={role === 'student' ? 'Email Address' : 'User ID'}
                     className="input-field pl-10"
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                     required
                   />
                 </div>
