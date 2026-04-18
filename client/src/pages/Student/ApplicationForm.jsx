@@ -72,6 +72,32 @@ const ApplicationForm = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // AUTO-UPDATE SUBJECTS WHEN BOARD CHANGES
+  useEffect(() => {
+    if (!master || !formData.qualifyingBoard) return;
+    
+    const board = formData.qualifyingBoard?.trim().toLocaleLowerCase();
+    let subjects = [];
+    
+    if (board?.includes('cbse')) subjects = master.cbseSubjects || ['English', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Computer Science'];
+    else if (board?.includes('icse')) subjects = master.icseSubjects || ['English', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Science'];
+    else if (board?.includes('state') || board?.includes('board')) subjects = master.stateBoardSubjects || ['Tamil', 'English', 'Maths', 'Physics', 'Chemistry', 'Biology'];
+    else if (board?.includes('iti')) subjects = master.itiSubjects || ['Trade Practical', 'Trade Theory', 'Work Shop', 'Drawing', 'Social'];
+    else if (board?.includes('vocational')) subjects = master.vocationalSubjects || ['Language', 'English', 'Maths', 'Theory', 'Practical-I', 'Practical-II'];
+    else subjects = master.otherSubjects || ['Subject 1', 'Subject 2', 'Subject 3', 'Subject 4', 'Subject 5', 'Subject 6'];
+    
+    // Update all 6 subject names with board subjects
+    setFormData(prev => ({
+      ...prev,
+      sub1Name: subjects[0] || '',
+      sub2Name: subjects[1] || '',
+      sub3Name: subjects[2] || '',
+      sub4Name: subjects[3] || '',
+      sub5Name: subjects[4] || '',
+      sub6Name: subjects[5] || '',
+    }));
+  }, [formData.qualifyingBoard, master]);
+
   const loadSavedData = async () => {
     try {
       const res = await axios.get('/api/student/me', { withCredentials: true });
