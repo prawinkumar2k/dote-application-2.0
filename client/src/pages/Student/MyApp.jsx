@@ -56,7 +56,6 @@ const MyApp = () => {
           <div className="flex items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Official Application Report</h1>
-              <p className="text-slate-500">Professional format suitable for printing and submission</p>
             </div>
             <button
               onClick={() => setViewMode('overview')}
