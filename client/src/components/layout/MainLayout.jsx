@@ -31,7 +31,7 @@ const MainLayout = ({ children, role = 'guest' }) => {
               {role === 'guest' ? (
                 <>
                   <Link to="/login" className="text-slate-600 hover:text-blue-600 font-medium">Login</Link>
-                  <Link to="/register" className="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">Register</Link>
+                  <Link to="/student-register" className="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">Student Register</Link>
                 </>
               ) : (
                 <div className="flex items-center gap-4">

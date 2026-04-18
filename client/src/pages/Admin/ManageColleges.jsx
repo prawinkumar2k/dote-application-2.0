@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
-import { Plus, Search, Filter, Edit, Trash2, Building, MapPin, Globe } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Building, MapPin, Globe, Loader2 } from 'lucide-react';
+import axios from 'axios';
 
 const ManageColleges = () => {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [colleges, setColleges] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const colleges = [
-    { id: '1', name: 'Government College of Technology', code: 'GCT001', location: 'Coimbatore', region: 'West', status: 'Active' },
-    { id: '2', name: 'Alagappa Chettiar Govt College', code: 'ACC002', location: 'Karaikudi', region: 'South', status: 'Active' },
-    { id: '3', name: 'Government College of Engineering', code: 'GCE003', location: 'Salem', region: 'West', status: 'Inactive' },
-    { id: '4', name: 'Thanthai Periyar Govt Institute', code: 'TPG004', location: 'Vellore', region: 'North', status: 'Active' },
-  ];
+  useEffect(() => {
+    const fetchColleges = async () => {
+      try {
+        const { data } = await axios.get('http://localhost:5000/api/admin/colleges', { withCredentials: true });
+        if (data.success && data.colleges) {
+          setColleges(data.colleges);
+        }
+      } catch (err) {
+        console.error('Failed to load colleges', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchColleges();
+  }, []);
 
   return (
     <MainLayout role="admin">
@@ -62,58 +74,72 @@ const ManageColleges = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {colleges.map((college) => (
-                  <tr key={college.id} className="hover:bg-blue-50/30 transition-colors group">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-slate-100 text-slate-500 rounded-xl group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
-                          <Building size={20} />
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-800 leading-tight">{college.name}</p>
-                          <p className="text-xs font-semibold text-blue-600 mt-0.5">{college.code}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
-                        <MapPin size={14} className="text-slate-400" />
-                        {college.location}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
-                        <Globe size={14} className="text-slate-400" />
-                        {college.region}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        college.status === 'Active' 
-                        ? 'bg-emerald-100 text-emerald-700' 
-                        : 'bg-slate-100 text-slate-500'
-                      }`}>
-                        {college.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all shadow-none hover:shadow-sm">
-                          <Edit size={18} />
-                        </button>
-                        <button className="p-2 text-slate-400 hover:text-rose-500 hover:bg-white rounded-lg transition-all shadow-none hover:shadow-sm border border-transparent hover:border-rose-100">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-12 text-center text-slate-400">
+                      <Loader2 className="animate-spin inline mr-2" size={20} /> Loading colleges...
                     </td>
                   </tr>
-                ))}
+                ) : colleges.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-12 text-center text-slate-400">
+                      No colleges found in the database.
+                    </td>
+                  </tr>
+                ) : (
+                  colleges.map((college) => (
+                    <tr key={college.id} className="hover:bg-blue-50/30 transition-colors group">
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2.5 bg-slate-100 text-slate-500 rounded-xl group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                            <Building size={20} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-800 leading-tight">{college.ins_name}</p>
+                            <p className="text-xs font-semibold text-blue-600 mt-0.5">{college.ins_code}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
+                          <MapPin size={14} className="text-slate-400" />
+                          {college.ins_city || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
+                          <Globe size={14} className="text-slate-400" />
+                          {college.ins_district || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          (college.ins_status || 'Active').toLowerCase() === 'active' 
+                          ? 'bg-emerald-100 text-emerald-700' 
+                          : 'bg-slate-100 text-slate-500'
+                        }`}>
+                          {college.ins_status || 'Active'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all shadow-none hover:shadow-sm">
+                            <Edit size={18} />
+                          </button>
+                          <button className="p-2 text-slate-400 hover:text-rose-500 hover:bg-white rounded-lg transition-all shadow-none hover:shadow-sm border border-transparent hover:border-rose-100">
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
           
           <div className="p-6 border-t border-slate-50 bg-slate-50/30 flex justify-between items-center">
-            <p className="text-xs text-slate-500 font-medium">Showing 4 colleges</p>
+            <p className="text-xs text-slate-500 font-medium">Showing {colleges.length} colleges</p>
             <div className="flex gap-2">
               <button className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-400 cursor-not-allowed">Prev</button>
               <button className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-blue-300 transition-colors">Next</button>

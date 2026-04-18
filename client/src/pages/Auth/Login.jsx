@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, LogIn, ChevronRight, AlertCircle } from 'lucide-react';
+import { User, Lock, LogIn, ChevronRight } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
@@ -13,12 +13,6 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
-    if (role !== 'admin') {
-      toast.info('Only Admin login is currently active. Student and College roles coming soon!');
-      return;
-    }
-
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
@@ -26,7 +20,7 @@ const Login = () => {
         password,
         role
       }, {
-        withCredentials: true // Important for cookies
+        withCredentials: true
       });
 
       if (response.data.success) {
@@ -86,31 +80,30 @@ const Login = () => {
                 ))}
               </div>
 
-              {role !== 'admin' && (
-                <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl flex gap-3 text-amber-800 text-sm animate-fade-in">
-                  <AlertCircle size={18} className="shrink-0" />
-                  <p>Only **Admin** role is active currently. Use **admin_dote** to test.</p>
-                </div>
-              )}
+
 
               <div className="space-y-4">
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <div className="flex items-center border border-slate-200 rounded-lg bg-white focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                  <span className="pl-3 pr-2 flex items-center text-slate-400 shrink-0">
+                    <User size={18} />
+                  </span>
                   <input 
                     type="text" 
                     placeholder="User ID" 
-                    className="input-field pl-10"
+                    className="flex-1 py-3 pr-4 bg-transparent outline-none text-slate-800 placeholder-slate-400 text-sm"
                     value={userId}
                     onChange={(e) => setUserId(e.target.value)}
                     required
                   />
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <div className="flex items-center border border-slate-200 rounded-lg bg-white focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                  <span className="pl-3 pr-2 flex items-center text-slate-400 shrink-0">
+                    <Lock size={18} />
+                  </span>
                   <input 
                     type="password" 
                     placeholder="Password" 
-                    className="input-field pl-10"
+                    className="flex-1 py-3 pr-4 bg-transparent outline-none text-slate-800 placeholder-slate-400 text-sm"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -136,7 +129,7 @@ const Login = () => {
             </form>
 
             <div className="mt-8 text-center text-slate-600">
-              Don't have an account? <Link to="/register" className="text-blue-600 font-bold hover:underline">Register now</Link>
+              Don't have an account? <Link to="/student-register" className="text-blue-600 font-bold hover:underline">Register now</Link>
             </div>
           </div>
         </div>
