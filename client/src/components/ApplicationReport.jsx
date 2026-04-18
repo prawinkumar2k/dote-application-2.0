@@ -4,7 +4,6 @@ import { Calendar, MapPin, Phone, Mail, User, BookOpen, Award } from 'lucide-rea
 const ApplicationReport = ({ data }) => {
   const s = data?.student;
   const m = data?.marks;
-  const c = data?.college;
 
   if (!s) return null;
 
