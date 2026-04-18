@@ -635,14 +635,19 @@ const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master }) => {
   const [cityFilter, setCityFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
 
-  const filteredColleges = colleges.filter(c => {
-    const matchCity = !cityFilter || c.ins_city === cityFilter;
-    const matchType = !typeFilter || c.ins_type === typeFilter;
-    return matchCity && matchType;
-  });
+  const filteredColleges = colleges
+    .filter(c => c.ins_type !== 'Self Finance') // Exclude Self Finance colleges
+    .filter(c => {
+      const matchCity = !cityFilter || c.ins_city === cityFilter;
+      const matchType = !typeFilter || c.ins_type === typeFilter;
+      return matchCity && matchType;
+    });
 
-  const cities = [...new Set(colleges.map(c => c.ins_city).filter(Boolean))].sort();
-  const types = master?.insType || ['Government', 'Aided', 'Self Finance'];
+  const validColleges = colleges.filter(c => c.ins_type !== 'Self Finance');
+  const cities = [...new Set(validColleges.map(c => c.ins_city).filter(Boolean))].sort();
+  // Exclude "Self Finance" from college type filter
+  const allTypes = master?.insType || ['Government', 'Aided', 'Self Finance'];
+  const types = allTypes.filter(t => t !== 'Self Finance');
 
   return (
     <div className="space-y-6">
@@ -664,7 +669,7 @@ const CollegeChoice = ({ data, onChange, onPrefChange, colleges, master }) => {
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Filter by City</label>
           <select className="input-field" value={cityFilter} onChange={e => setCityFilter(e.target.value)}>
-            <option value="">All Cities ({colleges.length} colleges)</option>
+            <option value="">All Cities ({validColleges.length} colleges)</option>
             {cities.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
