@@ -7,7 +7,7 @@ const { getMe, saveStep, uploadDocument, submitApplication } = require('../contr
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Photo goes to photos folder, others go to documents folder
-    const docType = req.body.docType;
+    const docType = req.query.docType;
     const folder = docType === 'photo' ? 'photos' : 'documents';
     const uploadPath = path.join(__dirname, `../uploads/student/${folder}`);
     cb(null, uploadPath);
@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     const studentId = String(req.user.id).padStart(3, '0'); // Pad to 3 digits: 001, 002, etc.
-    const docType = req.body.docType;
+    const docType = req.query.docType;
     
     // Document type abbreviations
     const typeMap = {

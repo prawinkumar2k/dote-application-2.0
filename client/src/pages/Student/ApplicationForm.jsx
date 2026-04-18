@@ -298,9 +298,8 @@ const ApplicationForm = () => {
     if (!file) return;
     const fd = new FormData();
     fd.append('file', file);
-    fd.append('docType', docType);
     try {
-      const res = await axios.post('/api/student/upload', fd, {
+      const res = await axios.post(`/api/student/upload?docType=${docType}`, fd, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },
       });

@@ -65,7 +65,7 @@ const uploadDocument = async (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
     const id = req.user.id;
-    const docType = req.body.docType;
+    const docType = req.query.docType;
     
     // Generate path based on document type
     const folder = docType === 'photo' ? 'photos' : 'documents';
