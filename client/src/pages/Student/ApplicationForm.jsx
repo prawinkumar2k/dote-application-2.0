@@ -98,6 +98,101 @@ const ApplicationForm = () => {
     }));
   }, [formData.qualifyingBoard, master]);
 
+  // AUTO-CALCULATE HSC PERCENTAGE AND CUTOFF MARK BASED ON MARKS ENTERED
+  useEffect(() => {
+    const marks = [
+      { obt: formData.sub1Obtained, max: formData.sub1Max },
+      { obt: formData.sub2Obtained, max: formData.sub2Max },
+      { obt: formData.sub3Obtained, max: formData.sub3Max },
+      { obt: formData.sub4Obtained, max: formData.sub4Max },
+      { obt: formData.sub5Obtained, max: formData.sub5Max },
+      { obt: formData.sub6Obtained, max: formData.sub6Max },
+    ];
+
+    // Calculate totals - only count if both obtained and max are filled
+    let totalObtained = 0;
+    let totalMax = 0;
+    let hasMarks = false;
+
+    marks.forEach(m => {
+      if (m.obt && m.max) {
+        totalObtained += Number(m.obt) || 0;
+        totalMax += Number(m.max) || 0;
+        hasMarks = true;
+      }
+    });
+
+    // Calculate percentage and cutoff
+    if (hasMarks && totalMax > 0) {
+      const percentage = ((totalObtained / totalMax) * 100).toFixed(2);
+      const cutoff = ((totalObtained / totalMax) * 200).toFixed(2);
+      
+      setFormData(prev => ({
+        ...prev,
+        hscPercentage: percentage,
+        hscCutoff: cutoff,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        hscPercentage: '',
+        hscCutoff: '',
+      }));
+    }
+  }, [
+    formData.sub1Obtained, formData.sub1Max,
+    formData.sub2Obtained, formData.sub2Max,
+    formData.sub3Obtained, formData.sub3Max,
+    formData.sub4Obtained, formData.sub4Max,
+    formData.sub5Obtained, formData.sub5Max,
+    formData.sub6Obtained, formData.sub6Max,
+  ]);
+
+  // AUTO-CALCULATE SSLC PERCENTAGE BASED ON MARKS ENTERED
+  useEffect(() => {
+    const sslcMarks = [
+      { obt: formData.sslcSub1Obt, max: formData.sslcSub1Max },
+      { obt: formData.sslcSub2Obt, max: formData.sslcSub2Max },
+      { obt: formData.sslcSub3Obt, max: formData.sslcSub3Max },
+      { obt: formData.sslcSub4Obt, max: formData.sslcSub4Max },
+      { obt: formData.sslcSub5Obt, max: formData.sslcSub5Max },
+    ];
+
+    // Calculate totals - only count if both obtained and max are filled
+    let totalObtained = 0;
+    let totalMax = 0;
+    let hasMarks = false;
+
+    sslcMarks.forEach(m => {
+      if (m.obt && m.max) {
+        totalObtained += Number(m.obt) || 0;
+        totalMax += Number(m.max) || 0;
+        hasMarks = true;
+      }
+    });
+
+    // Calculate percentage
+    if (hasMarks && totalMax > 0) {
+      const percentage = ((totalObtained / totalMax) * 100).toFixed(2);
+      
+      setFormData(prev => ({
+        ...prev,
+        sslcPercentage: percentage,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        sslcPercentage: '',
+      }));
+    }
+  }, [
+    formData.sslcSub1Obt, formData.sslcSub1Max,
+    formData.sslcSub2Obt, formData.sslcSub2Max,
+    formData.sslcSub3Obt, formData.sslcSub3Max,
+    formData.sslcSub4Obt, formData.sslcSub4Max,
+    formData.sslcSub5Obt, formData.sslcSub5Max,
+  ]);
+
   const loadSavedData = async () => {
     try {
       const res = await axios.get('/api/student/me', { withCredentials: true });
@@ -481,8 +576,8 @@ const MarksEntry = ({ data, onChange, master }) => {
         </table>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <InputGroup label="Overall Percentage (%)" name="hscPercentage" type="number" value={data.hscPercentage} onChange={onChange} placeholder="e.g. 85.5" />
-        <InputGroup label="Cutoff Mark (out of 200)" name="hscCutoff" type="number" value={data.hscCutoff} onChange={onChange} placeholder="e.g. 175" />
+        <InputGroup label="Overall Percentage (%)" name="hscPercentage" type="number" value={data.hscPercentage} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
+        <InputGroup label="Cutoff Mark (out of 200)" name="hscCutoff" type="number" value={data.hscCutoff} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
       </div>
     </div>
   );
@@ -519,7 +614,7 @@ const DetailedHistory = ({ data, onChange }) => (
         </tbody>
       </table>
     </div>
-    <InputGroup label="SSLC Overall Percentage (%)" name="sslcPercentage" type="number" value={data.sslcPercentage} onChange={onChange} placeholder="e.g. 88.0" />
+    <InputGroup label="SSLC Overall Percentage (%)" name="sslcPercentage" type="number" value={data.sslcPercentage} onChange={onChange} placeholder="Auto-calculated" disabled={true} />
   </div>
 );
 
