@@ -5,9 +5,16 @@ const { protect, authorize } = require('../middleware/auth.middleware');
 const { getMe, saveStep, uploadDocument, submitApplication } = require('../controllers/student.controller');
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads/student')),
+  destination: (req, file, cb) => {
+    // Photo goes to photos folder, others go to documents folder
+    const docType = req.body.docType;
+    const folder = docType === 'photo' ? 'photos' : 'documents';
+    const uploadPath = path.join(__dirname, `../uploads/student/${folder}`);
+    cb(null, uploadPath);
+  },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
+    // Generate clean filename with docType and timestamp
     cb(null, `${req.user.id}_${req.body.docType}_${Date.now()}${ext}`);
   },
 });

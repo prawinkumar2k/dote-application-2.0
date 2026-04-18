@@ -66,7 +66,10 @@ const uploadDocument = async (req, res) => {
 
     const id = req.user.id;
     const docType = req.body.docType;
-    const filePath = '/uploads/student/' + req.file.filename;
+    
+    // Generate path based on document type
+    const folder = docType === 'photo' ? 'photos' : 'documents';
+    const filePath = `/uploads/student/${folder}/${req.file.filename}`;
 
     switch (docType) {
       case 'photo': await Student.updatePhoto(id, filePath); break;
