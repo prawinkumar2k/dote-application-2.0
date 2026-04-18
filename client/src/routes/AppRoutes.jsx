@@ -21,9 +21,11 @@ const AppRoutes = () => {
       <Route path="/student-register" element={<Register />} />
 
       {/* Admin Routes */}
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/colleges" element={<ManageColleges />} />
-      <Route path="/admin/master-data" element={<MasterData />} />
+      <Route element={<ProtectedRoute role="admin" />}>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/colleges" element={<ManageColleges />} />
+        <Route path="/admin/master-data" element={<MasterData />} />
+      </Route>
 
       {/* College Routes */}
       <Route element={<ProtectedRoute role="college" />}>

@@ -17,7 +17,7 @@ const CollegeDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/college/dashboard/stats', { withCredentials: true });
+        const { data } = await axios.get('/api/college/dashboard/stats', { withCredentials: true });
         if (data.success) {
           setStats(data.stats);
           setRecentApps(data.recentApplications);
@@ -49,7 +49,7 @@ const CollegeDashboard = () => {
     <MainLayout role="college">
       <div className="space-y-8 animate-fade-in-up">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden group">
+        <div className="bg-linear-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-lg relative overflow-hidden group">
           <div className="relative z-10">
             <h1 className="text-3xl font-bold mb-2">Welcome back, Administrator 👋</h1>
             <p className="text-blue-100 max-w-xl leading-relaxed">
@@ -101,7 +101,7 @@ const CollegeDashboard = () => {
                <TrendingUp className="text-slate-400" size={20}/>
                Application Status
             </h2>
-            <div className="flex-1 min-h-[250px]">
+            <div className="flex-1 min-h-62.5">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -141,7 +141,7 @@ const CollegeDashboard = () => {
                <Users className="text-slate-400" size={20}/>
                Demand by Course Profile
             </h2>
-            <div className="flex-1 min-h-[250px]">
+            <div className="flex-1 min-h-62.5">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={courseData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />

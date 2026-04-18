@@ -1,22 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MainLayout from '../../components/layout/MainLayout';
-import { Search, Filter, Eye, CheckCircle, Clock, XCircle, Download, X } from 'lucide-react';
+import { Search, Eye, CheckCircle, Clock, XCircle, Download, X } from 'lucide-react';
 import { toast } from 'react-toastify';
+
+const StatusBadge = ({ status }) => {
+  const styles = {
+    Approved: 'bg-emerald-100 text-emerald-700',
+    Rejected: 'bg-rose-100 text-rose-700',
+    Pending: 'bg-amber-100 text-amber-700',
+  };
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-bold ${styles[status] || 'bg-slate-100 text-slate-600'}`}>
+      {status}
+    </span>
+  );
+};
 
 const ApplicationsList = () => {
   const [filter, setFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedApp, setSelectedApp] = useState(null);
   const [viewerUrl, setViewerUrl] = useState(null);
-
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     const fetchApps = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/college/applications', { withCredentials: true });
+        const { data } = await axios.get('/api/college/applications', { withCredentials: true });
         if (data.success && data.applications) {
           const formattedApps = data.applications.map(app => ({
             db_id: app.id,
@@ -43,7 +57,7 @@ const ApplicationsList = () => {
 
   const handleStatusChange = async (db_id, id_display, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/college/applications/${db_id}/status`, { status: newStatus }, { withCredentials: true });
+      await axios.put(`/api/college/applications/${db_id}/status`, { status: newStatus }, { withCredentials: true });
       setApps(apps.map(app => app.db_id === db_id ? { ...app, status: newStatus } : app));
       setSelectedApp(null);
       if (newStatus === 'Approved') toast.success('Application Approved successfully!');
@@ -56,10 +70,13 @@ const ApplicationsList = () => {
 
   const filteredApps = apps.filter(app => {
     const matchesFilter = filter === 'All' || app.status === filter;
-    const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           app.id.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+
+  const total = filteredApps.length;
+  const paginated = filteredApps.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleDownloadProfile = (app) => {
     const printWindow = window.open('', '_blank');
@@ -104,7 +121,7 @@ const ApplicationsList = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Incoming Applications</h1>
-            <p className="text-slate-500">{total} submitted application{total !== 1 ? 's' : ''} total</p>
+            <p className="text-slate-500">{apps.length} submitted application{apps.length !== 1 ? 's' : ''} total</p>
           </div>
         </div>
 
@@ -112,10 +129,10 @@ const ApplicationsList = () => {
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search by name or app ID..." 
-                className="w-full bg-slate-50 border border-slate-200 py-3 pl-12 pr-4 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400" 
+              <input
+                type="text"
+                placeholder="Search by name or app ID..."
+                className="w-full bg-slate-50 border border-slate-200 py-3 pl-12 pr-4 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -150,37 +167,37 @@ const ApplicationsList = () => {
                   <tr>
                     <td colSpan="6" className="px-6 py-12 text-center text-slate-400">Loading student applications...</td>
                   </tr>
-                ) : filteredApps.length === 0 ? (
+                ) : paginated.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-12 text-center text-slate-400">No applications match your criteria.</td>
                   </tr>
-                ) : filteredApps.map((app) => (
+                ) : paginated.map((app) => (
                   <tr key={app.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
-                          {app.student_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          {app.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </div>
                         <div>
-                          <p className="font-bold text-slate-800">{app.student_name}</p>
+                          <p className="font-bold text-slate-800">{app.name}</p>
                           <p className="text-xs text-slate-400">{app.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-5 text-sm font-semibold text-blue-600">{app.application_no}</td>
-                    <td className="px-4 py-5 font-medium text-slate-700">{app.community || '—'}</td>
+                    <td className="px-4 py-5 text-sm font-semibold text-blue-600">{app.id}</td>
+                    <td className="px-4 py-5 font-medium text-slate-700">{app.raw?.community || '—'}</td>
                     <td className="px-4 py-5 text-center">
-                      <span className="font-bold text-blue-600">{app.hsc_percentage ? `${app.hsc_percentage}%` : '—'}</span>
+                      <span className="font-bold text-blue-600">{app.raw?.hsc_percentage ? `${app.raw.hsc_percentage}%` : '—'}</span>
                     </td>
                     <td className="px-4 py-5">
                       <div className="flex gap-1 flex-wrap">
-                        {app.differently_abled === 'yes' && <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">DA</span>}
-                        {app.ex_servicemen === 'yes' && <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">EX</span>}
-                        {app.eminent_sports === 'yes' && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">SP</span>}
+                        {app.raw?.differently_abled === 'yes' && <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">DA</span>}
+                        {app.raw?.ex_servicemen === 'yes' && <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">EX</span>}
+                        {app.raw?.eminent_sports === 'yes' && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">SP</span>}
                       </div>
                     </td>
                     <td className="px-4 py-5 text-right">
-                      <button 
+                      <button
                         onClick={() => setSelectedApp(app)}
                         className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all shadow-none hover:shadow-sm"
                       >
@@ -193,13 +210,13 @@ const ApplicationsList = () => {
             </table>
           </div>
 
-          {total > 20 && (
+          {total > PAGE_SIZE && (
             <div className="mt-6 flex justify-between items-center">
-              <p className="text-xs text-slate-500">Showing {apps.length} of {total}</p>
+              <p className="text-xs text-slate-500">Showing {paginated.length} of {total}</p>
               <div className="flex gap-2">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
                   className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 disabled:opacity-40">Prev</button>
-                <button onClick={() => setPage(p => p + 1)} disabled={page * 20 >= total}
+                <button onClick={() => setPage(p => p + 1)} disabled={page * PAGE_SIZE >= total}
                   className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 disabled:opacity-40">Next</button>
               </div>
             </div>
@@ -222,26 +239,22 @@ const ApplicationsList = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-8 overflow-y-auto space-y-8 flex-1 custom-scrollbar">
               {/* Profile Header */}
               <div className="flex items-center gap-5 border-b border-slate-100 pb-8">
                 {selectedApp?.raw?.photo ? (
-                  <img 
-                    src={`http://localhost:5000${selectedApp.raw.photo}`} 
+                  <img
+                    src={selectedApp.raw.photo}
                     alt={selectedApp.name}
                     className="w-20 h-20 rounded-[1.25rem] object-cover shadow-sm shrink-0 border border-slate-200"
-                    onError={(e) => {
-                      e.target.onerror = null; 
-                      e.target.style.display = 'none'; // Fallback hide if broken
-                      e.target.nextSibling.style.display = 'flex'; // Show text fallback
-                    }}
+                    onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
                   />
                 ) : null}
-                <div 
+                <div
                   className={`w-20 h-20 rounded-[1.25rem] bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-2xl shadow-inner shrink-0 ${selectedApp?.raw?.photo ? 'hidden' : 'flex'}`}
                 >
-                  {selectedApp.name.split(' ').map(n => n[0]).join('').substring(0,2)}
+                  {selectedApp.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 tracking-tight">{selectedApp.name}</h3>
@@ -258,7 +271,7 @@ const ApplicationsList = () => {
 
               {/* Data Grid Sections */}
               <div className="space-y-10">
-                {/* 1. Personal Information */}
+                {/* Personal Information */}
                 <div>
                   <h4 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center"><span className="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>Personal Information</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
@@ -273,7 +286,7 @@ const ApplicationsList = () => {
                   </div>
                 </div>
 
-                {/* 2. Family & Contact Data */}
+                {/* Family & Contact Data */}
                 <div>
                   <h4 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center"><span className="w-2 h-2 rounded-full bg-indigo-500 mr-2"></span>Family & Contact Details</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-y-6 gap-x-4">
@@ -286,27 +299,27 @@ const ApplicationsList = () => {
                   </div>
                 </div>
 
-                {/* 3. Academic & Documents */}
+                {/* Academic & Documents */}
                 <div>
                   <h4 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center"><span className="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>Academic & Certificates</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-4">
                     <div className="col-span-full"><div className="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">Last School Attended</div><div className="font-semibold text-slate-800">{selectedApp?.raw?.last_studied_school_name || '-'}</div></div>
-                    
+
                     <div className="col-span-full mt-2">
                       <div className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider">Student Attachments</div>
                       <div className="flex flex-wrap gap-3">
                         {selectedApp?.raw?.marksheet_certificate && (
-                          <button onClick={() => setViewerUrl(`http://localhost:5000${selectedApp.raw.marksheet_certificate}`)} className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 hover:bg-amber-100 transition-colors rounded-lg text-sm font-bold border border-amber-100">
+                          <button onClick={() => setViewerUrl(selectedApp.raw.marksheet_certificate)} className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 hover:bg-amber-100 transition-colors rounded-lg text-sm font-bold border border-amber-100">
                             View Marksheet
                           </button>
                         )}
                         {selectedApp?.raw?.transfer_certificate && (
-                          <button onClick={() => setViewerUrl(`http://localhost:5000${selectedApp.raw.transfer_certificate}`)} className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 hover:bg-emerald-100 transition-colors rounded-lg text-sm font-bold border border-emerald-100">
+                          <button onClick={() => setViewerUrl(selectedApp.raw.transfer_certificate)} className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 hover:bg-emerald-100 transition-colors rounded-lg text-sm font-bold border border-emerald-100">
                             View Transfer Certificate
                           </button>
                         )}
                         {selectedApp?.raw?.community_certificate && (
-                          <button onClick={() => setViewerUrl(`http://localhost:5000${selectedApp.raw.community_certificate}`)} className="inline-flex items-center gap-2 bg-purple-50 text-purple-700 px-4 py-2 hover:bg-purple-100 transition-colors rounded-lg text-sm font-bold border border-purple-100">
+                          <button onClick={() => setViewerUrl(selectedApp.raw.community_certificate)} className="inline-flex items-center gap-2 bg-purple-50 text-purple-700 px-4 py-2 hover:bg-purple-100 transition-colors rounded-lg text-sm font-bold border border-purple-100">
                             View Community Certificate
                           </button>
                         )}
@@ -317,16 +330,15 @@ const ApplicationsList = () => {
                 </div>
               </div>
 
-
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4">
-                <button 
+                <button
                   onClick={() => handleStatusChange(selectedApp.db_id, selectedApp.id, 'Approved')}
                   className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-all hover:-translate-y-0.5 shadow-lg shadow-emerald-500/30"
                 >
                   Approve Candidate
                 </button>
-                <button 
+                <button
                   onClick={() => handleStatusChange(selectedApp.db_id, selectedApp.id, 'Rejected')}
                   className="flex-1 bg-white border-2 border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200 font-bold py-4 rounded-xl transition-all"
                 >
@@ -348,13 +360,13 @@ const ApplicationsList = () => {
               </button>
             </div>
             <div className="overflow-auto rounded-xl bg-slate-100 flex items-center justify-center w-[800px] h-[600px] max-w-full max-h-[85vh]">
-              <img 
-                src={viewerUrl} 
-                className="max-w-full max-h-full object-contain" 
+              <img
+                src={viewerUrl}
+                className="max-w-full max-h-full object-contain"
                 alt="Document Preview"
                 onError={(e) => {
-                  e.target.onerror = null; 
-                  e.target.src = 'https://placehold.co/800x600/f1f5f9/94a3b8?text=Image+Not+Found+in+%2Fuploads'; 
+                  e.target.onerror = null;
+                  e.target.src = 'https://placehold.co/800x600/f1f5f9/94a3b8?text=Image+Not+Found';
                 }}
               />
             </div>

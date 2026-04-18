@@ -138,7 +138,7 @@ const login = async (req, res) => {
       }
 
       authUser = userRecord;
-      displayName = toStr(userRecord.user_name) || userId;
+      displayName = toStr(userRecord.user_name) || identifier;
 
     // ─── STUDENT ────────────────────────────────────────────────────────────
     } else if (role === 'student') {
@@ -166,7 +166,7 @@ const login = async (req, res) => {
       }
 
       authUser = student;
-      displayName = toStr(userRecord.user_name) || identifier;
+      displayName = toStr(student.student_name) || identifier;
 
     } else {
       return res.status(400).json({ message: `Unknown role: ${role}` });
@@ -177,8 +177,13 @@ const login = async (req, res) => {
       return res.status(500).json({ message: 'Authentication failed unexpectedly' });
     }
 
+    let tokenId;
+    if (role === 'college') tokenId = authUser.ins_code;
+    else if (role === 'admin') tokenId = authUser.user_id;
+    else tokenId = authUser.id; // student: always use primary key
+
     const token = jwt.sign(
-      { id: authUser.ins_code || authUser.user_id || authUser.id, role, name: displayName },
+      { id: tokenId, role, name: displayName },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
@@ -193,7 +198,7 @@ const login = async (req, res) => {
       success: true,
       role,
       user: {
-        id: authUser.ins_code || authUser.user_id || authUser.id,
+        id: tokenId,
         name: displayName,
         role,
       },

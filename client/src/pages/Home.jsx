@@ -21,7 +21,7 @@ const Home = () => {
             A state-of-the-art platform connecting students with the right colleges. Transparent, efficient, and user-friendly.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link to="/register" className="btn-primary flex items-center gap-2 text-lg px-8 py-3">
+            <Link to="/student-register" className="btn-primary flex items-center gap-2 text-lg px-8 py-3">
               Get Started <ArrowRight size={20} />
             </Link>
             <Link to="/login" className="px-8 py-3 rounded-lg border border-slate-300 font-semibold text-slate-700 hover:bg-slate-50 transition-all text-lg">
