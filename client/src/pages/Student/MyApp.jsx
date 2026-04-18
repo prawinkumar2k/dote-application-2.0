@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
+import ApplicationReport from '../../components/ApplicationReport';
 import { FileText, CheckCircle, Download, Clock, MapPin, Phone, Mail, User } from 'lucide-react';
 import axios from 'axios';
 
 const MyApp = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState('overview'); // 'overview' or 'report'
 
   useEffect(() => {
     axios.get('/api/student/me', { withCredentials: true })
@@ -28,6 +30,54 @@ const MyApp = () => {
 
   if (!s) return <MainLayout role="student"><div className="flex items-center justify-center h-64 text-slate-500">No application data found.</div></MainLayout>;
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadPDF = () => {
+    // For actual PDF generation, you would integrate a library like react-pdf or html2pdf
+    const element = document.getElementById('report-container');
+    const opt = {
+      margin: 10,
+      filename: `application_${s?.application_no || 'draft'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+    // Users can print to PDF from browser print dialog
+    window.print();
+  };
+
+  // Show professional report if in report mode
+  if (viewMode === 'report') {
+    return (
+      <MainLayout role="student">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">Official Application Report</h1>
+              <p className="text-slate-500">Professional format suitable for printing and submission</p>
+            </div>
+            <button
+              onClick={() => setViewMode('overview')}
+              className="px-6 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition"
+            >
+              ← Back to Overview
+            </button>
+          </div>
+          <div id="report-container">
+            <ApplicationReport
+              data={data}
+              onPrint={handlePrint}
+              onDownload={handleDownloadPDF}
+            />
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  // Original overview mode
   const subjects = m ? [
     { name: m.hsc_subject1, obtained: m.hsc_subject1_obtained_mark, max: m.hsc_subject1_max_mark },
     { name: m.hsc_subject2, obtained: m.hsc_subject2_obtained_mark, max: m.hsc_subject2_max_mark },
@@ -48,6 +98,9 @@ const MyApp = () => {
             <p className="text-slate-500">View your submitted details and current status</p>
           </div>
           <div className="flex gap-3">
+            <button onClick={() => setViewMode('report')} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors">
+              <FileText size={18} /> Official Report
+            </button>
             <button onClick={handleDownloadJSON} className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors">
               <Download size={18} /> Download JSON
             </button>

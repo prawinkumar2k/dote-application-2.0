@@ -69,17 +69,34 @@ const uploadDocument = async (req, res) => {
     
     // Generate path based on document type
     const folder = docType === 'photo' ? 'photos' : 'documents';
-    const filePath = `/uploads/student/${folder}/${req.file.filename}`;
+    // Filename is now in format: ph001.jpg, tc001.pdf, marksheet001.pdf, community001.pdf
+    const filename = req.file.filename;
+    const filePath = `/uploads/student/${folder}/${filename}`;
+
+    console.log(`📤 Uploading ${docType} for student ${id}: ${filename}`);
 
     switch (docType) {
-      case 'photo': await Student.updatePhoto(id, filePath); break;
-      case 'tc': await Student.updateTC(id, filePath); break;
-      case 'marksheet': await Student.updateMarksheet(id, filePath); break;
-      case 'community': await Student.updateCommunity(id, filePath); break;
-      default: return res.status(400).json({ message: 'Invalid document type' });
+      case 'photo': 
+        await Student.updatePhoto(id, filePath);
+        console.log(`✓ Photo saved: ${filePath}`);
+        break;
+      case 'tc': 
+        await Student.updateTC(id, filePath);
+        console.log(`✓ Transfer Certificate saved: ${filePath}`);
+        break;
+      case 'marksheet': 
+        await Student.updateMarksheet(id, filePath);
+        console.log(`✓ Marksheet saved: ${filePath}`);
+        break;
+      case 'community': 
+        await Student.updateCommunity(id, filePath);
+        console.log(`✓ Community Certificate saved: ${filePath}`);
+        break;
+      default: 
+        return res.status(400).json({ message: 'Invalid document type' });
     }
 
-    res.json({ success: true, path: filePath });
+    res.json({ success: true, path: filePath, filename: filename });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

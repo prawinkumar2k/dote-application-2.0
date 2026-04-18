@@ -14,8 +14,21 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    // Generate clean filename with docType and timestamp
-    cb(null, `${req.user.id}_${req.body.docType}_${Date.now()}${ext}`);
+    const studentId = String(req.user.id).padStart(3, '0'); // Pad to 3 digits: 001, 002, etc.
+    const docType = req.body.docType;
+    
+    // Document type abbreviations
+    const typeMap = {
+      'photo': 'ph',
+      'tc': 'tc',
+      'marksheet': 'marksheet',
+      'community': 'community'
+    };
+    
+    const abbreviation = typeMap[docType] || docType;
+    // Generate professional filename: ph001.jpg, tc001.pdf, marksheet001.pdf, etc.
+    const filename = `${abbreviation}${studentId}${ext}`;
+    cb(null, filename);
   },
 });
 
