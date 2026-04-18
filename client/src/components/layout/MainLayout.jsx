@@ -1,31 +1,34 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, Bell, Settings, Building, Database, GraduationCap, FileText, ClipboardList } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const MainLayout = ({ children, role = 'guest' }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Logic for logout
+  const user = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch { return {}; } })();
+
+  const handleLogout = async () => {
+    try { await axios.post('/api/auth/logout', {}, { withCredentials: true }); } catch {}
+    localStorage.removeItem('user');
+    toast.success('Logged out successfully');
     navigate('/login');
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8fafc]">
-      {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-2">
-              <Link to="/" className="flex items-center gap-2">
-                <div className="bg-blue-600 p-1.5 rounded-lg">
-                  <span className="text-white font-bold text-xl">D</span>
-                </div>
-                <span className="text-xl font-bold tracking-tight text-slate-800">DOTE Portal</span>
-              </Link>
-            </div>
+            <Link to="/" className="flex items-center gap-2">
+              <div className="bg-blue-600 p-1.5 rounded-lg">
+                <span className="text-white font-bold text-xl">D</span>
+              </div>
+              <span className="text-xl font-bold tracking-tight text-slate-800">DOTE Portal</span>
+            </Link>
 
             <div className="hidden md:flex items-center gap-6">
               {role === 'guest' ? (
@@ -39,10 +42,8 @@ const MainLayout = ({ children, role = 'guest' }) => {
                     <Bell size={20} />
                   </button>
                   <div className="flex items-center gap-2 bg-slate-50 p-1.5 pr-3 rounded-full border border-slate-200">
-                    <div className="bg-blue-100 p-1.5 rounded-full text-blue-600">
-                      <User size={18} />
-                    </div>
-                    <span className="text-sm font-semibold text-slate-700 capitalize">{role}</span>
+                    <div className="bg-blue-100 p-1.5 rounded-full text-blue-600"><User size={18} /></div>
+                    <span className="text-sm font-semibold text-slate-700">{user.name || role}</span>
                   </div>
                   <button onClick={handleLogout} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors">
                     <LogOut size={20} />
@@ -51,11 +52,8 @@ const MainLayout = ({ children, role = 'guest' }) => {
               )}
             </div>
 
-            <div className="md:hidden flex items-center">
-              <button 
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2 text-slate-600"
-              >
+            <div className="md:hidden">
+              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-slate-600">
                 {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
             </div>
@@ -63,9 +61,7 @@ const MainLayout = ({ children, role = 'guest' }) => {
         </div>
       </nav>
 
-      {/* Main Content Area */}
       <div className="flex flex-1">
-        {/* Sidebar for specific roles (optional) */}
         {role !== 'guest' && (
           <aside className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out z-30 w-64 bg-white border-r border-slate-200 pt-16 md:pt-0`}>
             <div className="p-4 space-y-2">
@@ -89,13 +85,8 @@ const MainLayout = ({ children, role = 'guest' }) => {
           </aside>
         )}
 
-        {/* Page Content */}
         <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             {children}
           </motion.div>
         </main>
@@ -111,10 +102,7 @@ const MainLayout = ({ children, role = 'guest' }) => {
 };
 
 const SidebarItem = ({ to, icon, label }) => (
-  <Link 
-    to={to} 
-    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-all group"
-  >
+  <Link to={to} className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-all group">
     <span className="group-hover:scale-110 transition-transform">{icon}</span>
     <span className="font-medium">{label}</span>
   </Link>
