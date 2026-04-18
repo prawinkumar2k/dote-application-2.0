@@ -89,7 +89,7 @@ const StudentDashboard = () => {
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Call to Action */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl">
+            <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl">
               <div className="absolute top-0 right-0 p-4 opacity-10"><Zap size={120} /></div>
               <h2 className="text-2xl font-bold mb-4 relative z-10">
                 {isSubmitted ? '✓ Application Submitted' : 'Complete Your Application'}
@@ -131,7 +131,7 @@ const StudentDashboard = () => {
                   <span className="text-2xl font-bold text-slate-900">{pct}%</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-500" 
+                  <div className="bg-linear-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-500" 
                     style={{ width: `${pct}%` }} />
                 </div>
                 <p className="text-xs text-slate-500 mt-2">
@@ -186,7 +186,7 @@ const StudentDashboard = () => {
                   <span className="text-lg font-bold text-slate-900">{docsUploaded}/4</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-                  <div className="bg-gradient-to-r from-emerald-500 to-teal-600 h-3 rounded-full transition-all duration-500"
+                  <div className="bg-linear-to-r from-emerald-500 to-teal-600 h-3 rounded-full transition-all duration-500"
                     style={{ width: `${docsPct}%` }} />
                 </div>
               </div>
@@ -282,7 +282,7 @@ const StudentDashboard = () => {
             </div>
 
             {/* Status Badge */}
-            <div className={`rounded-3xl p-6 text-white ${isSubmitted ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-amber-500 to-orange-600'}`}>
+            <div className={`rounded-3xl p-6 text-white ${isSubmitted ? 'bg-linear-to-br from-emerald-500 to-teal-600' : 'bg-linear-to-br from-amber-500 to-orange-600'}`}>
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-white/20 rounded-lg">
                   {isSubmitted ? <CheckCircle size={24} /> : <Clock size={24} />}
@@ -448,10 +448,6 @@ const CheckItem = ({ done, text }) => (
       {done && <CheckCircle size={12} className="text-white" fill="white" />}
     </div>
     <span className={`text-sm ${done ? 'text-slate-800 font-semibold' : 'text-slate-600'}`}>
-      {text}
-    </span>
-  </div>
-);
       {text}
     </span>
   </div>
