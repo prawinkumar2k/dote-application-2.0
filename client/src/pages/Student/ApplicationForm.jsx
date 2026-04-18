@@ -73,7 +73,7 @@ const ApplicationForm = () => {
                 </div>
                 <div className="mt-2 text-xs font-semibold text-slate-600 absolute -bottom-6 w-max">{step.title}</div>
                 {step.id < steps.length && (
-                  <div className={`absolute left-1/2 top-5 w-full h-0.5 -z-0 ${currentStep > step.id ? 'bg-blue-600' : 'bg-slate-200'}`}></div>
+                  <div className={`absolute left-1/2 top-5 w-full h-0.5 z-0 ${currentStep > step.id ? 'bg-blue-600' : 'bg-slate-200'}`}></div>
                 )}
               </div>
             ))}
