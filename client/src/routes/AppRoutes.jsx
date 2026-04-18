@@ -19,27 +19,29 @@ const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/student-register" element={<Register />} />
-      
+
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/colleges" element={<ManageColleges />} />
       <Route path="/admin/master-data" element={<MasterData />} />
-    </Route>
 
-    <Route element={<ProtectedRoute role="college" />}>
-      <Route path="/college/dashboard" element={<CollegeDashboard />} />
-      <Route path="/college/applications" element={<ApplicationsList />} />
-      <Route path="/college/applications/:id" element={<ApplicationDetail />} />
-    </Route>
+      {/* College Routes */}
+      <Route element={<ProtectedRoute role="college" />}>
+        <Route path="/college/dashboard" element={<CollegeDashboard />} />
+        <Route path="/college/applications" element={<ApplicationsList />} />
+        <Route path="/college/applications/:id" element={<ApplicationDetail />} />
+      </Route>
 
-    <Route element={<ProtectedRoute role="student" />}>
-      <Route path="/student/dashboard" element={<StudentDashboard />} />
-      <Route path="/student/apply" element={<ApplicationForm />} />
-      <Route path="/student/my-application" element={<MyApp />} />
-    </Route>
+      {/* Student Routes */}
+      <Route element={<ProtectedRoute role="student" />}>
+        <Route path="/student/dashboard" element={<StudentDashboard />} />
+        <Route path="/student/apply" element={<ApplicationForm />} />
+        <Route path="/student/my-application" element={<MyApp />} />
+      </Route>
 
-    <Route path="*" element={<Navigate to="/" replace />} />
-  </Routes>
-);
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
 
 export default AppRoutes;

@@ -185,7 +185,7 @@ const ApplicationsList = () => {
                         className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all shadow-none hover:shadow-sm"
                       >
                         <Eye size={20} />
-                      </Link>
+                      </button>
                     </td>
                   </tr>
                 ))}

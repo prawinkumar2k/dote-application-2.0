@@ -16,7 +16,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
-        userId,
+        identifier,
         password,
         role
       }, {
@@ -82,8 +82,8 @@ const Login = () => {
                     type="text" 
                     placeholder="User ID" 
                     className="flex-1 py-3 pr-4 bg-transparent outline-none text-slate-800 placeholder-slate-400 text-sm"
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                     required
                   />
                 </div>
