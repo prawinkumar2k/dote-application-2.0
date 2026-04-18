@@ -421,7 +421,7 @@ const MarksEntry = ({ data, onChange, master }) => {
         <SelectGroup label="Major Stream" name="hscMajorStream" options={master?.hscMajorStream || ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts', 'Vocational']} value={data.hscMajorStream} onChange={onChange} />
       </div>
       <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 overflow-x-auto">
-        <table className="w-full text-left min-w-[500px]">
+        <table className="w-full text-left min-w-full">
           <thead>
             <tr className="text-sm font-bold text-slate-600 border-b border-slate-200">
               <th className="pb-3 pr-3">Subject Name</th>
@@ -456,7 +456,7 @@ const DetailedHistory = ({ data, onChange }) => (
       <InputGroup label="SSLC Marksheet Number" name="sslcMarksheetNo" value={data.sslcMarksheetNo} onChange={onChange} />
     </div>
     <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 overflow-x-auto">
-      <table className="w-full text-left min-w-[500px]">
+      <table className="w-full text-left min-w-full">
         <thead>
           <tr className="text-sm font-bold text-slate-600 border-b border-slate-200">
             <th className="pb-3 pr-3">Subject</th><th className="pb-3 pr-3">Marks Obtained</th><th className="pb-3">Max Marks</th>
