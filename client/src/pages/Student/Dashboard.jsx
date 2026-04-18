@@ -233,7 +233,7 @@ const StudentDashboard = () => {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-8 w-full">
+          <div className="space-y-8 w-full lg:mt-8">
             {/* Quick Info Card */}
             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
               <h2 className="text-xl font-bold text-slate-800 mb-6">Your Information</h2>
