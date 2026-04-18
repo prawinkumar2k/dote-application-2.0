@@ -7,7 +7,7 @@ import axios from 'axios';
 const MyApp = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('overview'); // 'overview' or 'report'
+  const [viewMode, setViewMode] = useState('report'); // 'overview' or 'report'
 
   useEffect(() => {
     axios.get('/api/student/me', { withCredentials: true })
