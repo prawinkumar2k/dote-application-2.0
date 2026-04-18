@@ -36,17 +36,6 @@ const MyApp = () => {
     return (
       <MainLayout role="student">
         <div className="space-y-6">
-          <div className="flex items-center justify-between gap-6">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">Official Application Report</h1>
-            </div>
-            <button
-              onClick={() => setViewMode('overview')}
-              className="px-6 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition"
-            >
-              ← Back to Overview
-            </button>
-          </div>
           <div id="report-container">
             <ApplicationReport data={data} />
           </div>
