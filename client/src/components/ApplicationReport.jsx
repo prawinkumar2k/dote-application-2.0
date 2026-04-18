@@ -1,7 +1,7 @@
 import React from 'react';
-import { Download, Printer, Calendar, MapPin, Phone, Mail, User, BookOpen, Award } from 'lucide-react';
+import { Calendar, MapPin, Phone, Mail, User, BookOpen, Award } from 'lucide-react';
 
-const ApplicationReport = ({ data, onPrint, onDownload }) => {
+const ApplicationReport = ({ data }) => {
   const s = data?.student;
   const m = data?.marks;
   const c = data?.college;
@@ -27,22 +27,6 @@ const ApplicationReport = ({ data, onPrint, onDownload }) => {
 
   return (
     <div className="w-full">
-      {/* Print & Download Controls */}
-      <div className="mb-6 flex gap-3 print:hidden">
-        <button
-          onClick={onPrint}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          <Printer size={18} /> Print Report
-        </button>
-        <button
-          onClick={onDownload}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition"
-        >
-          <Download size={18} /> Download PDF
-        </button>
-      </div>
-
       {/* Report Container - Optimized for Print */}
       <div className="bg-white p-8 print:p-6 print:max-w-full">
         {/* Header */}
