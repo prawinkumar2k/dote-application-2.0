@@ -8,11 +8,61 @@ const db = require('../config/db.config');
  */
 const toStr = (val) => (val ? val.toString() : null);
 
+const register = async (req, res) => {
+  try {
+    const { name, email, password, mobile, role } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ message: 'Please provide all fields' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    if (role === 'student') {
+      // Check if student already exists
+      const [[existing]] = await db.query(
+        'SELECT id FROM student_master WHERE email = ?',
+        [email]
+      );
+
+      if (existing) {
+        return res.status(409).json({ message: 'Student already registered with this email' });
+      }
+
+      // Create new student
+      const [result] = await db.query(
+        'INSERT INTO student_master (student_name, email, mobile, password, role) VALUES (?, ?, ?, ?, ?)',
+        [name, email, mobile || null, hashedPassword, 'student']
+      );
+
+      const studentId = result.insertId;
+      const token = jwt.sign(
+        { id: studentId, role: 'student', name },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRE }
+      );
+
+      return res.status(201).json({
+        success: true,
+        message: 'Student registered successfully',
+        token,
+        user: { id: studentId, name, email, role: 'student' }
+      });
+    } else {
+      return res.status(400).json({ message: 'Registration only available for students' });
+    }
+  } catch (err) {
+    console.error('[Register error]', err);
+    res.status(500).json({ message: 'Server error', detail: err.message });
+  }
+};
+
 const login = async (req, res) => {
   try {
     const { identifier, password, role } = req.body;
 
-    if (!userId || !password || !role) {
+    if (!identifier || !password || !role) {
       return res.status(400).json({ message: 'Please provide all fields' });
     }
 
@@ -23,14 +73,14 @@ const login = async (req, res) => {
     if (role === 'college') {
       const [[college]] = await db.query(
         'SELECT * FROM institution_master WHERE ins_code = ?',
-        [userId]
+        [identifier]
       );
 
       console.log('[College login] Record:', college);
 
       if (!college) {
         return res.status(401).json({
-          message: `No college found with ins_code "${userId}"`,
+          message: `No college found with ins_code "${identifier}"`,
         });
       }
 
@@ -62,7 +112,7 @@ const login = async (req, res) => {
     } else if (role === 'admin') {
       const [[userRecord]] = await db.query(
         'SELECT * FROM user_master WHERE user_id = ?',
-        [userId]
+        [identifier]
       );
 
       console.log('[Admin login] Record:', userRecord);
@@ -93,8 +143,8 @@ const login = async (req, res) => {
     // ─── STUDENT ────────────────────────────────────────────────────────────
     } else if (role === 'student') {
       const [[student]] = await db.query(
-        'SELECT * FROM student_master WHERE user_id = ?',
-        [userId]
+        'SELECT * FROM student_master WHERE email = ? OR user_id = ?',
+        [identifier, identifier]
       );
 
       console.log('[Student login] Record:', student);
@@ -116,7 +166,7 @@ const login = async (req, res) => {
       }
 
       authUser = student;
-      displayName = toStr(student.name) || toStr(student.student_name) || userId;
+      displayName = toStr(userRecord.user_name) || identifier;
 
     } else {
       return res.status(400).json({ message: `Unknown role: ${role}` });
@@ -127,9 +177,8 @@ const login = async (req, res) => {
       return res.status(500).json({ message: 'Authentication failed unexpectedly' });
     }
 
-    const name = user.user_name || user.student_name || user.ins_name;
     const token = jwt.sign(
-      { id: authUser.ins_code || authUser.user_id, role, name: displayName },
+      { id: authUser.ins_code || authUser.user_id || authUser.id, role, name: displayName },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
@@ -144,7 +193,7 @@ const login = async (req, res) => {
       success: true,
       role,
       user: {
-        id: authUser.ins_code || authUser.user_id,
+        id: authUser.ins_code || authUser.user_id || authUser.id,
         name: displayName,
         role,
       },
