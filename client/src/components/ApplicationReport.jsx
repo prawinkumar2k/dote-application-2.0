@@ -45,7 +45,7 @@ const ApplicationReport = ({ data }) => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
           {/* Passport Photo */}
           <div className="lg:col-span-1 flex flex-col items-center gap-4">
-            <div className="w-[200px] h-[220px] bg-slate-100 rounded-lg overflow-hidden border-2 border-slate-300 shadow-md flex items-center justify-center print:w-[150px] print:h-[180px]">
+            <div className="w-50 h-55 bg-slate-100 rounded-lg overflow-hidden border-2 border-slate-300 shadow-md flex items-center justify-center print:w-37.5 print:h-45">
               {s.photo ? (
                 <img
                   src={s.photo}
@@ -56,7 +56,7 @@ const ApplicationReport = ({ data }) => {
                 <User size={80} className="text-slate-300" />
               )}
             </div>
-            <div className="text-center text-xs text-slate-600 max-w-[200px]">
+            <div className="text-center text-xs text-slate-600 max-w-50">
               <p className="font-bold">Passport Size Photo</p>
               <p className="text-[10px]">3.5cm × 4.5cm</p>
             </div>
