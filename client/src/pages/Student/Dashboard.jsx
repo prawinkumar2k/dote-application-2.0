@@ -4,7 +4,7 @@ import MainLayout from '../../components/layout/MainLayout';
 import { 
   FileText, ArrowRight, Download, CheckCircle, Clock, AlertCircle, BookOpen,
   DollarSign, Calendar, Users, Award, Zap, Info, Mail, Phone, MapPin,
-  FileCheck, Upload, Eye, Settings
+  FileCheck, Upload, Eye, Settings, User
 } from 'lucide-react';
 import axios from 'axios';
 
