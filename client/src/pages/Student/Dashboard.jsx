@@ -452,6 +452,10 @@ const CheckItem = ({ done, text }) => (
     </span>
   </div>
 );
+      {text}
+    </span>
+  </div>
+);
 
 const InfoRow = ({ label, value, highlight }) => (
   <div className="flex justify-between items-center py-2 border-b border-slate-50">
