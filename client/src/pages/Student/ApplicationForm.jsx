@@ -404,21 +404,35 @@ const AcademicHistory = ({ data, onChange, master }) => (
 );
 
 const MarksEntry = ({ data, onChange, master }) => {
+  // Get board-specific subjects based on qualifyingBoard selection
+  const getSubjectsForBoard = () => {
+    const board = data.qualifyingBoard?.trim().toLocaleLowerCase();
+    if (board?.includes('cbse')) return master?.cbseSubjects || ['English', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Computer Science'];
+    if (board?.includes('icse')) return master?.icseSubjects || ['English', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Science'];
+    if (board?.includes('state') || board?.includes('board')) return master?.stateBoardSubjects || ['Tamil', 'English', 'Maths', 'Physics', 'Chemistry', 'Biology'];
+    if (board?.includes('iti')) return master?.itiSubjects || ['Trade Practical', 'Trade Theory', 'Work Shop', 'Drawing', 'Social'];
+    if (board?.includes('vocational')) return master?.vocationalSubjects || ['Language', 'English', 'Maths', 'Theory', 'Practical-I', 'Practical-II'];
+    return master?.otherSubjects || ['Subject 1', 'Subject 2', 'Subject 3', 'Subject 4', 'Subject 5', 'Subject 6'];
+  };
+
+  const defaultSubjects = getSubjectsForBoard();
   const hscSubjects = [
-    { nameKey: 'sub1Name', obtKey: 'sub1Obtained', maxKey: 'sub1Max' },
-    { nameKey: 'sub2Name', obtKey: 'sub2Obtained', maxKey: 'sub2Max' },
-    { nameKey: 'sub3Name', obtKey: 'sub3Obtained', maxKey: 'sub3Max' },
-    { nameKey: 'sub4Name', obtKey: 'sub4Obtained', maxKey: 'sub4Max' },
-    { nameKey: 'sub5Name', obtKey: 'sub5Obtained', maxKey: 'sub5Max' },
-    { nameKey: 'sub6Name', obtKey: 'sub6Obtained', maxKey: 'sub6Max' },
+    { nameKey: 'sub1Name', obtKey: 'sub1Obtained', maxKey: 'sub1Max', default: defaultSubjects[0] || 'Subject 1' },
+    { nameKey: 'sub2Name', obtKey: 'sub2Obtained', maxKey: 'sub2Max', default: defaultSubjects[1] || 'Subject 2' },
+    { nameKey: 'sub3Name', obtKey: 'sub3Obtained', maxKey: 'sub3Max', default: defaultSubjects[2] || 'Subject 3' },
+    { nameKey: 'sub4Name', obtKey: 'sub4Obtained', maxKey: 'sub4Max', default: defaultSubjects[3] || 'Subject 4' },
+    { nameKey: 'sub5Name', obtKey: 'sub5Obtained', maxKey: 'sub5Max', default: defaultSubjects[4] || 'Subject 5' },
+    { nameKey: 'sub6Name', obtKey: 'sub6Obtained', maxKey: 'sub6Max', default: defaultSubjects[5] || 'Subject 6' },
   ];
+
   return (
     <div className="space-y-6">
-      <SectionTitle title="5. Marks Entry (HSC / Qualifying Exam)" />
+      <SectionTitle title={`5. Marks Entry (${data.qualifyingBoard || 'Qualifying Exam'})`} />
+      {!data.qualifyingBoard && <div className="bg-amber-50 p-3 rounded text-amber-800 text-sm">⚠️ Select a Qualifying Board in Step 4 to see subject options</div>}
       <div className="grid md:grid-cols-3 gap-4">
-        <InputGroup label="HSC Register Number" name="hscRegisterNo" value={data.hscRegisterNo} onChange={onChange} />
+        <InputGroup label="Exam Register Number" name="hscRegisterNo" value={data.hscRegisterNo} onChange={onChange} />
         <SelectGroup label="Exam Type" name="hscExamType" options={master?.hscExamType || ['Regular', 'Private', 'Improvement']} value={data.hscExamType} onChange={onChange} />
-        <SelectGroup label="Major Stream" name="hscMajorStream" options={master?.hscMajorStream || ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts', 'Vocational']} value={data.hscMajorStream} onChange={onChange} />
+        <SelectGroup label="Major Stream (if applicable)" name="hscMajorStream" options={master?.hscMajorStream || ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts']} value={data.hscMajorStream} onChange={onChange} />
       </div>
       <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 overflow-x-auto">
         <table className="w-full text-left min-w-full">
@@ -432,9 +446,9 @@ const MarksEntry = ({ data, onChange, master }) => {
           <tbody>
             {hscSubjects.map(s => (
               <tr key={s.nameKey} className="border-b border-slate-100 last:border-0">
-                <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2" value={data[s.nameKey]} onChange={onChange} placeholder="Subject name" /></td>
+                <td className="py-2 pr-3"><input type="text" name={s.nameKey} className="input-field py-2" value={data[s.nameKey]} onChange={onChange} placeholder={s.default} /></td>
                 <td className="py-2 pr-3"><input type="number" name={s.obtKey} className="input-field py-2" value={data[s.obtKey]} onChange={onChange} min="0" placeholder="0" /></td>
-                <td className="py-2"><input type="number" name={s.maxKey} className="input-field py-2" value={data[s.maxKey]} onChange={onChange} min="0" /></td>
+                <td className="py-2"><input type="number" name={s.maxKey} className="input-field py-2" value={data[s.maxKey]} onChange={onChange} min="0" placeholder="100" /></td>
               </tr>
             ))}
           </tbody>

@@ -85,8 +85,15 @@ app.get('/api/master', async (req, res) => {
       mediumOfInstruction: ['Tamil', 'English', 'Urdu', 'Others'],
       admissionType: ['First Year', 'Lateral Entry (2nd Year)', 'Part-Time'],
       hscExamType: ['Regular', 'Private', 'Improvement'],
-      hscMajorStream: ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts', 'Vocational'],
+      hscMajorStream: ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts'],
       nativity: ['Tamil Nadu', 'Other State'],
+      // Board-specific subjects
+      cbseSubjects: ['English', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Computer Science'],
+      icseSubjects: ['English', 'Maths', 'Physics', 'Chemistry', 'Biology', 'Science'],
+      stateBoardSubjects: ['Tamil', 'English', 'Maths', 'Physics', 'Chemistry', 'Biology'],
+      itiSubjects: ['Trade Practical', 'Trade Theory', 'Work Shop', 'Drawing', 'Social'],
+      vocationalSubjects: ['Language', 'English', 'Maths', 'Theory', 'Practical-I', 'Practical-II'],
+      otherSubjects: ['Subject 1', 'Subject 2', 'Subject 3', 'Subject 4', 'Subject 5', 'Subject 6'],
     });
   } catch (err) {
     console.error(err);
