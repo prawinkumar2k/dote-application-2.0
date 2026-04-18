@@ -91,12 +91,12 @@ const Login = () => {
                   <input type={role === 'student' ? 'email' : 'text'}
                     placeholder={role === 'student' ? 'Email Address' : role === 'college' ? 'College Code (e.g. 101)' : 'User ID'}
                     className="input-field pl-10" value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)} required />
+                    onChange={(e) => setIdentifier(e.target.value)} autoComplete="username" required />
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input type="password" placeholder="Password" className="input-field pl-10"
-                    value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
                 </div>
               </div>
 

@@ -23,9 +23,9 @@ const Student = {
   updateStep1: async (id, d) => {
     await db.query(
       `UPDATE student_master SET student_name=?, dob=?, gender=?, aadhar=?, religion=?, community=?, caste=?,
-       mother_tongue=?, medium_of_instruction=?, nativity=?, civic_native=? WHERE id=?`,
+       admission_type=?, mother_tongue=?, medium_of_instruction=?, nativity=? WHERE id=?`,
       [d.fullName, d.dob, d.gender, d.aadhaar, d.religion, d.community, d.caste,
-       d.motherTongue || null, d.mediumOfInstruction || null, d.nativity || null, d.civicNative || null, id]
+       d.admissionType || null, d.motherTongue || null, d.mediumOfInstruction || null, d.nativity || null, id]
     );
   },
 
