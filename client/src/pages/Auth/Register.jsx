@@ -8,14 +8,14 @@ const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    name: '', email: '', mobile: '', dob: '', gender: '', password: '', confirmPassword: '',
+    name: '', email: '', password: '', confirmPassword: '',
   });
 
   const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.mobile || !form.dob || !form.gender || !form.password) {
+    if (!form.name || !form.email || !form.password) {
       toast.error('Please fill all required fields'); return;
     }
     if (form.password !== form.confirmPassword) {
@@ -27,7 +27,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/register', form, { withCredentials: true });
+      const res = await axios.post('/api/auth/register', { ...form, role: 'student' }, { withCredentials: true });
       if (res.data.success) {
         localStorage.setItem('user', JSON.stringify(res.data.user));
         toast.success('Account created successfully! Welcome to DOTE Portal.');
@@ -52,22 +52,18 @@ const Register = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Field icon={<User size={18} />} name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required />
-          <Field icon={<Mail size={18} />} name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} required />
-          <Field icon={<Phone size={18} />} name="mobile" placeholder="Mobile Number" value={form.mobile} onChange={handleChange} required />
-          <Field icon={<Calendar size={18} />} name="dob" type="date" placeholder="Date of Birth" value={form.dob} onChange={handleChange} required />
-
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Gender</label>
-            <select name="gender" className="input-field" value={form.gender} onChange={handleChange} required>
-              <option value="">Select Gender</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
-            </select>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Account Type</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><User size={18} /></span>
+              <input type="text" value="Student" readOnly className="input-field pl-10 bg-slate-50 cursor-not-allowed" />
+            </div>
           </div>
 
-          <Field icon={<Lock size={18} />} name="password" type="password" placeholder="Create Password (min 8 chars)" value={form.password} onChange={handleChange} required />
+          <Field icon={<User size={18} />} name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required />
+          <Field icon={<Mail size={18} />} name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} required />
+          
+          <Field icon={<Lock size={18} />} name="password" type="password" placeholder="Create Password (min 8 characters)" value={form.password} onChange={handleChange} required />
           <Field icon={<Lock size={18} />} name="confirmPassword" type="password" placeholder="Confirm Password" value={form.confirmPassword} onChange={handleChange} required />
 
           <button type="submit" disabled={loading}
