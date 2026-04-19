@@ -140,8 +140,8 @@ const login = async (req, res) => {
     // ─── STUDENT ────────────────────────────────────────────────────────────
     } else if (role === 'student') {
       const [[student]] = await db.query(
-        'SELECT * FROM student_master WHERE email = ? OR user_id = ?',
-        [identifier, identifier]
+        'SELECT * FROM student_master WHERE email = ?',
+        [identifier]
       );
 
       if (!student) {

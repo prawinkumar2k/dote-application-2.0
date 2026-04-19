@@ -7,35 +7,34 @@ html, body {
 }
 
 :root {
-  --primary: #1e40af;
+  --primary: #2563eb;
   --primary-light: #3b82f6;
-  --primary-dark: #1e3a8a;
+  --primary-dark: #1e40af;
   --secondary: #10b981;
   --accent: #f59e0b;
-  --background: #f1f5f9;
+  --background: #ffffff;
   --surface: #ffffff;
-  --text-main: #0f172a;
+  --text-main: #1e293b;
   --text-muted: #64748b;
-  --border: #e2e8f0;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  --border: #cbd5e1;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --glass: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.3);
+  --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: 'Inter', sans-serif;
   background-color: var(--background);
   color: var(--text-main);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 a {
@@ -50,35 +49,17 @@ button {
   font-family: inherit;
 }
 
-.glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-md);
-  border-radius: var(--radius-md);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background: var(--primary);
   color: white;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(30, 64, 175, 0.2);
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: background-color 0.2s ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(30, 64, 175, 0.3);
+  background: var(--primary-dark);
 }
 
 .input-field {
