@@ -1,8 +1,8 @@
 const db = require('../config/db.config');
 
 const Student = {
-  findByUserId: async (userId) => {
-    const [rows] = await db.query('SELECT * FROM student_master WHERE user_id = ?', [userId]);
+  findByEmail: async (email) => {
+    const [rows] = await db.query('SELECT * FROM student_master WHERE email = ?', [email]);
     return rows[0];
   },
 

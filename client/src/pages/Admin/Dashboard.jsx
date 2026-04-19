@@ -253,4 +253,18 @@ const StatCard = ({ icon, label, value, color = 'blue' }) => (
   </div>
 );
 
+const InfoRow = ({ label, value, status }) => {
+  const colors = {
+    green: 'bg-emerald-100 text-emerald-700',
+    blue: 'bg-blue-100 text-blue-700',
+    red: 'bg-red-100 text-red-700',
+  };
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+      <span className="text-sm text-slate-500 font-medium">{label}</span>
+      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${colors[status]}`}>{value}</span>
+    </div>
+  );
+};
+
 export default AdminDashboard;
