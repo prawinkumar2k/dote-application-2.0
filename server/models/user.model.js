@@ -16,6 +16,11 @@ const User = {
   },
 
   // Add more queries as needed
+
+  getAdminCount: async () => {
+    const [rows] = await db.query("SELECT COUNT(*) as total FROM user_master WHERE role = 'admin'");
+    return rows[0].total;
+  },
 };
 
 module.exports = User;
