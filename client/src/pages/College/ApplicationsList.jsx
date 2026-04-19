@@ -352,14 +352,14 @@ const ApplicationsList = () => {
 
       {/* In-App Attachment Viewer Modal */}
       {viewerUrl && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fade-in" onClick={() => setViewerUrl(null)}>
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fade-in" onClick={() => setViewerUrl(null)}>
           <div className="relative bg-white p-2 rounded-2xl shadow-2xl flex flex-col animate-fade-in-up" onClick={e => e.stopPropagation()}>
             <div className="flex justify-end p-2 absolute right-4 top-4 z-10 bg-white/50 shadow rounded-full backdrop-blur">
               <button onClick={() => setViewerUrl(null)} className="text-slate-800 hover:text-red-600 hover:bg-white rounded-full p-1 transition-all">
                 <X size={24} />
               </button>
             </div>
-            <div className="overflow-auto rounded-xl bg-slate-100 flex items-center justify-center w-[800px] h-[600px] max-w-full max-h-[85vh]">
+            <div className="overflow-auto rounded-xl bg-slate-100 flex items-center justify-center w-200 h-150 max-w-full max-h-[85vh]">
               <img
                 src={viewerUrl}
                 className="max-w-full max-h-full object-contain"
