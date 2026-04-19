@@ -134,7 +134,7 @@ const ManageColleges = () => {
           </div>
           <div className="flex gap-2">
             <select
-              className="input-field w-auto min-w-[180px]"
+              className="input-field w-auto min-w-45"
               value={district}
               onChange={e => { setDistrict(e.target.value); setPage(1); }}
             >
@@ -297,7 +297,7 @@ const ManageColleges = () => {
                   <FormField label="Pincode" name="ins_pincode" value={formData.ins_pincode} onChange={handleInputChange} placeholder="e.g. 641013" maxLength={10} />
                   <div className="md:col-span-2">
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Full Address</label>
-                    <textarea name="ins_address" value={formData.ins_address} onChange={handleInputChange} className="input-field min-h-[80px]" placeholder="Enter the complete institution address" />
+                    <textarea name="ins_address" value={formData.ins_address} onChange={handleInputChange} className="input-field min-h-20" placeholder="Enter the complete institution address" />
                   </div>
                 </div>
 
