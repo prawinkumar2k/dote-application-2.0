@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db.config');
+const Institution = require('../models/institution.model');
+const Student = require('../models/student.model');
+const User = require('../models/user.model');
 
 /**
  * Helper: safely convert a DB password value to string.
@@ -279,4 +282,4 @@ const getColleges = async (req, res) => {
   }
 };
 
-module.exports = { login, logout, addCollege, getDashboardStats, getColleges };
+module.exports = { register, login, logout, addCollege, getDashboardStats, getColleges };
