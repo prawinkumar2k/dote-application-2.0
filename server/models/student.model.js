@@ -8,7 +8,108 @@ const Student = {
 
   // Add more queries for student application here
 
+  findById: async (id) => {
+    const [rows] = await db.query('SELECT * FROM student_master WHERE id = ?', [id]);
+    return rows[0];
+  },
+
+  findByAadhaar: async (aadhar) => {
+    const [rows] = await db.query('SELECT id FROM student_master WHERE aadhar = ?', [aadhar]);
+    return rows[0];
+  },
+
+  updateStep1: async (id, d) => {
+    await db.query(
+      `UPDATE student_master SET 
+        student_name=?, dob=?, gender=?, aadhar=?, religion=?, community=?, caste=?, 
+        admission_type=?, mother_tongue=?, nativity=? 
+      WHERE id=?`,
+      [
+        d.fullName, d.dob, d.gender, d.aadhaar, d.religion, d.community, d.caste,
+        d.admissionType, d.motherTongue, d.nativity, id
+      ]
+    );
+  },
+
+  updateStep2: async (id, d) => {
+    await db.query(
+      `UPDATE student_master SET email=?, alt_mobile=?, communication_address=?, permanent_address=? WHERE id=?`,
+      [d.email, d.alternateMobile || null, d.commAddress, d.permAddress, id]
+    );
+  },
+
+  updateStep3: async (id, d) => {
+    await db.query(
+      `UPDATE student_master SET father_name=?, mother_name=?, parent_occupation=?, parent_annual_income=? WHERE id=?`,
+      [d.fatherName, d.motherName, d.parentOccupation, d.annualIncome, id]
+    );
+  },
+
+  updateStep4: async (id, d) => {
+    await db.query(
+      `UPDATE student_master SET 
+        last_institution_board=?, last_institution_register_no=?, last_institution_name=?, last_institution_district=?, last_institution_state=?,
+        medium_of_instruction=?, civic_school_type=?,
+        standard_studied=?, standard_school_name=?, standard_yop=?, standard_district=?, standard_state=?
+      WHERE id=?`,
+      [
+        d.qualifyingBoard, d.registerNumber, d.lastInstitute, d.lastInstituteDistrict, d.lastInstituteState,
+        d.mediumOfInstruction, d.civicSchoolType,
+        d.standard_studied || null, d.standard_school_name || null, d.standard_yop || null, d.standard_district || null, d.standard_state || null,
+        id
+      ]
+    );
+  },
+
+  updateStep6: async (id, d) => {
+    await db.query(
+      `UPDATE student_master SET differently_abled=?, ex_servicemen=?, eminent_sports=?, school_type=? WHERE id=?`,
+      [
+        d.isDifferentlyAbled ? 'yes' : 'no',
+        d.isExServiceman ? 'yes' : 'no',
+        d.isSportsPerson ? 'yes' : 'no',
+        d.isGovtStudent ? 'govt' : 'private',
+        id
+      ]
+    );
+  },
+
+  updateStep7: async (id, d) => {
+    await db.query(
+      `UPDATE student_master SET hostel_choice=?, womens_choice=?, college_choices=? WHERE id=?`,
+      [
+        d.hostelRequired ? 'yes' : 'no',
+        d.womensHostel ? 'yes' : 'no',
+        JSON.stringify(d.preferences || []),
+        id
+      ]
+    );
+  },
+
+  updatePhoto: async (id, path) => {
+    await db.query('UPDATE student_master SET photo=? WHERE id=?', [path, id]);
+  },
+
+  updateTC: async (id, path) => {
+    await db.query('UPDATE student_master SET transfer_certificate=? WHERE id=?', [path, id]);
+  },
+
+  updateMarksheet: async (id, path) => {
+    await db.query('UPDATE student_master SET marksheet_certificate=? WHERE id=?', [path, id]);
+  },
+
+  updateCommunity: async (id, path) => {
+    await db.query('UPDATE student_master SET community_certificate=? WHERE id=?', [path, id]);
+  },
+
+  submit: async (id) => {
+    const appNo = `DOTE2026${Math.floor(1000 + Math.random() * 9000)}`;
+    await db.query('UPDATE student_master SET application_no=?, application_status=? WHERE id=?', [appNo, 'Submitted', id]);
+    return appNo;
+  },
+
   getCount: async () => {
+
     const [rows] = await db.query('SELECT COUNT(*) as total FROM student_master');
     return rows[0].total;
   },

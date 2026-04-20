@@ -13,9 +13,8 @@ const getMe = async (req, res) => {
       student.student_name && student.dob && student.gender ? 1 : 0,
       student.email && student.communication_address ? 1 : 0,
       student.father_name && student.mother_name ? 1 : 0,
-      student.last_institution_board && student.last_institution_register_no ? 1 : 0,
-      marks && marks.hsc_subject1_obtained_mark ? 1 : 0,
-      marks && marks.sslc_register_no ? 1 : 0,
+      student.last_institution_board && student.last_institution_name ? 1 : 0,
+      marks && (marks.sslc_register_no || marks.hsc_register_no) ? 1 : 0,
       student.differently_abled !== null ? 1 : 0,
       student.college_choices ? 1 : 0,
       student.photo ? 1 : 0,
@@ -47,9 +46,8 @@ const saveStep = async (req, res) => {
       case 3: await Student.updateStep3(id, data); break;
       case 4: await Student.updateStep4(id, data); break;
       case 5: await Application.upsertStep5(id, data); break;
-      case 6: await Application.upsertStep6(id, data); break;
+      case 6: await Student.updateStep6(id, data); break;
       case 7: await Student.updateStep7(id, data); break;
-      case 8: await Student.updateStep8(id, data); break;
       default: return res.status(400).json({ message: 'Invalid step' });
     }
 
